@@ -14,7 +14,7 @@ export default function Header() {
   return (
     <>
       {/* viewport width 640px 이상 */}
-      <nav class='hidden sm:px-[90px] 2xl:px-[400px] sm:flex justify-center items-center w-screen h-[88px] bg-white border-b border-[#E1E1E1] z-1'>
+      <nav class='hidden sm:px-[90px] 2xl:px-[400px] sm:flex justify-center items-center w-screen h-[88px] bg-white border-b border-[#E1E1E1]'>
         <div class='flex justify-between items-center w-full'>
           <div class='flex items-center '>
             <Link
@@ -37,7 +37,7 @@ export default function Header() {
       </nav>
 
       {/* viewport width 640px 미만 */}
-      <nav class='flex sm:hidden justify-center items-center w-screen h-[52px] bg-white border-b border-[#E1E1E1] z-1'>
+      <nav class='flex sm:hidden justify-center items-center w-screen h-[52px] bg-white border-b border-[#E1E1E1]'>
         <button onClick={toggleSideBar} class='absolute start-4'>
           <img src={MenuIcon} alt='메뉴 버튼' />
         </button>
@@ -53,9 +53,9 @@ export default function Header() {
         <>
           <div
             onClick={toggleSideBar}
-            class='fixed top-0 left-0 z-2 w-screen h-screen bg-modalBg sm:hidden'
+            class='fixed top-0 left-0 z-10 w-screen h-screen bg-modalBg sm:hidden'
           ></div>
-          <div class='fixed top-0 left-0 z-3 w-8/12 h-screen bg-white sm:hidden'>
+          <div class='fixed top-0 left-0 z-20 w-8/12 h-screen bg-white sm:hidden'>
             <div class='flex flex-col items-start p-10'>
               <div class='flex items-center h-[88px]'>
                 <LoginButton />
