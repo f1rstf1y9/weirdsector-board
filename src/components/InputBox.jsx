@@ -36,7 +36,7 @@ export default function InputBox({
           <img
             src={currentType == 'password' ? EyeIcon : EyeOffIcon}
             alt='비밀번호 보이기/숨기기'
-            className='cursor-pointer'
+            className='cursor-pointer w-6'
             onClick={toggleType}
           ></img>
         )}
