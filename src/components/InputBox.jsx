@@ -21,7 +21,7 @@ export default function InputBox({
   return (
     <>
       <div
-        className={`h-[55px] bg-white rounded border ${currentIsInvalid ? 'border-error' : 'border-[#E1E1E1]'} focus-within:border-black px-6 py-3.5 flex gap-4 `}
+        className={`w-full h-[55px] bg-white rounded border ${currentIsInvalid ? 'border-error' : 'border-[#E1E1E1]'} focus-within:border-black px-6 py-3.5 flex gap-4 `}
       >
         <input
           type={currentType}
