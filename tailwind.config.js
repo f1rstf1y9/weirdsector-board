@@ -8,6 +8,7 @@ export default {
       },
       colors: {
         red: '#EE3918',
+        error: '#EB4852',
         modalBg: 'rgba(0,0,0,0.4)',
       },
     },
