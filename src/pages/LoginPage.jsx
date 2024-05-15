@@ -10,7 +10,7 @@ export default function LoginPage() {
 
   return (
     <div className='w-full flex justify-center items-center py-[100px] sm:py-[200px]'>
-      <div className='w-full sm:w-[358px] sm:w-[384px] flex flex-col items-center'>
+      <div className='w-full w-[358px] sm:w-[384px] flex flex-col items-center'>
         <h1 className='font-bold text-[26px] sm:text-[32px]'>로그인</h1>
         <div className='w-full flex flex-col gap-2 mt-6 sm:mt-8 mb-4'>
           <InputBox
