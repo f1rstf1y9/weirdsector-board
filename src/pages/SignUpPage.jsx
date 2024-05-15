@@ -48,7 +48,9 @@ export default function SignUpPage() {
             </p>
           </div>
         </div>
-        <Button children='로그인' width='w-[142px]' height='h-[48px]' />
+        <Button width='w-[142px]' height='h-[48px]'>
+          회원가입
+        </Button>
       </div>
     </div>
   );

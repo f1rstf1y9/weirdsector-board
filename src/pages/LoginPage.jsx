@@ -26,7 +26,7 @@ export default function LoginPage() {
             errMsg={passwordErrMsg}
           />
         </div>
-        <Button children='로그인' />
+        <Button>로그인</Button>
         <div className='flex gap-4 mt-8 text-sm'>
           <Link to='#' className='text-[#808080]'>
             아이디 찾기
