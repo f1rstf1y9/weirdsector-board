@@ -1,4 +1,7 @@
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import { useEffect } from 'react';
+import { supabase } from './supabase';
+import { useAuthStore } from '@store/store.js';
 
 import Layout from '@components/Layout.jsx';
 import BoardPage from '@pages/BoardPage.jsx';
@@ -9,6 +12,29 @@ import DashboardPage from '@pages/DashboardPage.jsx';
 import NotFoundPage from '@pages/NotFoundPage.jsx';
 
 function App() {
+  const { setUser, setIsAuthInitialized } = useAuthStore();
+
+  useEffect(() => {
+    const subscription = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN') {
+        if (session?.user) {
+          const userData = {
+            id: session.user.id,
+            nickname: session.user.user_metadata?.nickname,
+          };
+          setUser(userData);
+        }
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null);
+      }
+
+      setIsAuthInitialized(true);
+    });
+    return () => {
+      subscription.data.subscription.unsubscribe();
+    };
+  }, []);
+
   const router = createBrowserRouter([
     {
       path: '/',
