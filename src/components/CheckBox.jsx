@@ -1,13 +1,10 @@
-import { useState } from 'react';
 import { Checkbox } from '@headlessui/react';
 
-export default function CheckBox() {
-  const [enabled, setEnabled] = useState(false);
-
+export default function CheckBox({ onChange, isChecked }) {
   return (
     <Checkbox
-      checked={enabled}
-      onChange={setEnabled}
+      checked={isChecked}
+      onChange={onChange}
       className='group block w-6 h-6 rounded-[5px] border bg-[#F9F9F9] border-[#E1E1E1] data-[checked]:bg-black data-[checked]:border-none flex justify-center items-center'
     >
       <svg

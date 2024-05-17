@@ -1,7 +1,14 @@
+import { useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+
 import Button from '@components/Button';
 import CheckIcon from '@assets/icon-check.svg';
 
 export default function SignUpCompletePage() {
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  useEffect(() => window.scrollTo(0, 0), [pathname]);
+
   return (
     <>
       <div className='flex flex-col items-center my-[100px] sm:my-[200px]'>
@@ -12,7 +19,11 @@ export default function SignUpCompletePage() {
           </p>
           <p className='text-base sm:text-xl text-[#808080]'>축하드려요!</p>
         </div>
-        <Button width='w-[142px]' height='h-[48px]'>
+        <Button
+          width='w-[142px]'
+          height='h-[48px]'
+          onClick={() => navigate('/login')}
+        >
           로그인
         </Button>
       </div>
