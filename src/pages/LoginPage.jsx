@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabase';
+import { useAuthStore } from '../store/store.js';
 
 import InputBox from '@components/InputBox';
 import Button from '@components/Button';
 
 export default function LoginPage() {
   const navigate = useNavigate();
+
+  const { user } = useAuthStore();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -15,12 +18,10 @@ export default function LoginPage() {
   const [passwordErr, setPasswordErr] = useState('');
 
   useEffect(() => {
-    const user = supabase.auth.getUser();
-
     if (user) {
       navigate('/');
     }
-  }, []);
+  }, [user, navigate]);
 
   const loginHandler = async (e) => {
     e.preventDefault();
