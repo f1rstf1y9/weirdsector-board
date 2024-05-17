@@ -11,6 +11,9 @@ export default {
         error: '#EB4852',
         modalBg: 'rgba(0,0,0,0.4)',
       },
+      boxShadow: {
+        dd: '0 4px 10px rgba(0,0,0,0.2)',
+      },
     },
   },
   plugins: [],
