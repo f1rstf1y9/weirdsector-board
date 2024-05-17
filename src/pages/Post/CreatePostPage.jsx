@@ -1,6 +1,5 @@
 import { useState } from 'react';
 
-import InputBox from '@components/InputBox.jsx';
 import Button from '@components/Button.jsx';
 
 export default function CreatePostPage() {
