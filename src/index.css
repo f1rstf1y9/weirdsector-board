@@ -29,5 +29,7 @@ input:-webkit-autofill:active {
 
 input:focus {
   outline: none !important;
-  border: none !important;
+}
+textarea:focus {
+  outline: none !important;
 }
