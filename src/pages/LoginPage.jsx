@@ -5,8 +5,8 @@ import InputBox from '@components/InputBox';
 import Button from '@components/Button';
 
 export default function LoginPage() {
-  const [emailErrMsg, setEmailErrMsg] = useState('');
-  const [passwordErrMsg, setPasswordErrMsg] = useState('');
+  const [emailErr, setEmailErr] = useState('');
+  const [passwordErr, setPasswordErr] = useState('');
 
   return (
     <div className='w-full flex justify-center items-center py-[100px] sm:py-[200px]'>
@@ -17,13 +17,15 @@ export default function LoginPage() {
             placeholder='이메일 주소'
             type='email'
             isInvalid={false}
-            errMsg={emailErrMsg}
+            err={emailErr}
+            setErr={setEmailErr}
           />
           <InputBox
             placeholder='비밀번호 입력'
             type='password'
             isInvalid={false}
-            errMsg={passwordErrMsg}
+            err={passwordErr}
+            setErr={setPasswordErr}
           />
         </div>
         <Button>로그인</Button>
