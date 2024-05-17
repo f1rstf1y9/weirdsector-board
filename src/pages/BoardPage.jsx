@@ -1,9 +1,13 @@
+import { useNavigate } from 'react-router-dom';
+
 import BoardTable from '@components/BoardTable';
 import BoardTab from '@components/BoardTab';
 import BoardPagination from '@components/BoardPagination';
 import Button from '@components/Button';
 
 export default function BoardPage() {
+  const navigate = useNavigate();
+
   return (
     <>
       <div className='w-full flex flex-col items-center'>
@@ -44,7 +48,11 @@ export default function BoardPage() {
           <div className='w-full flex items-start justify-center relative h-[106px] lg:h-[48px]'>
             <BoardPagination totalPages={13} />
             <div className='absolute bottom-0 lg:top-0 right-0'>
-              <Button width='w-[127px]' height='h-[48px]'>
+              <Button
+                width='w-[127px]'
+                height='h-[48px]'
+                onClick={() => navigate('create-post')}
+              >
                 글쓰기
               </Button>
             </div>
