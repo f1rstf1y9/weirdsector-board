@@ -55,7 +55,6 @@ export default function LoginPage() {
             _onChange={(e) => setEmail(e.target.value)}
             placeholder='이메일 주소'
             type='email'
-            isInvalid={false}
             err={emailErr}
             setErr={setEmailErr}
             autocomplete='username'
@@ -65,7 +64,6 @@ export default function LoginPage() {
             _onChange={(e) => setPassword(e.target.value)}
             placeholder='비밀번호 입력'
             type='password'
-            isInvalid={false}
             err={passwordErr}
             setErr={setPasswordErr}
             autocomplete='current-password'

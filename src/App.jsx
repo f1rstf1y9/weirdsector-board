@@ -10,6 +10,9 @@ import SignUpPage from '@pages/SignUpPage.jsx';
 import SignUpCompletePage from '@pages/SignUpCompletePage.jsx';
 import DashboardPage from '@pages/DashboardPage.jsx';
 import NotFoundPage from '@pages/NotFoundPage.jsx';
+import CreatePostPage from '@/pages/Post/CreatePostPage.jsx';
+import UpdatePostPage from '@/pages/Post/UpdatePostPage.jsx';
+import PostPage from '@/pages/Post/PostPage.jsx';
 
 function App() {
   const { setUser, setIsAuthInitialized } = useAuthStore();
@@ -45,6 +48,10 @@ function App() {
           element: <BoardPage />,
         },
         {
+          path: ':board',
+          element: <BoardPage />,
+        },
+        {
           path: 'login',
           element: <LoginPage />,
         },
@@ -55,6 +62,18 @@ function App() {
         {
           path: 'signup-complete',
           element: <SignUpCompletePage />,
+        },
+        {
+          path: ':board/create-post',
+          element: <CreatePostPage />,
+        },
+        {
+          path: ':board/:postId',
+          element: <PostPage />,
+        },
+        {
+          path: ':board/:postId/update',
+          element: <UpdatePostPage />,
         },
         {
           path: '*',
