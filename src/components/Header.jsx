@@ -1,15 +1,24 @@
-import { Link } from 'react-router-dom';
-import { useState } from 'react';
+import { useLocation, Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { supabase } from '../supabase/index.js';
+import { useAuthStore } from '../store/store.js';
 
 import LoginButton from '@components/LoginButton.jsx';
+import Dropdown from '@components/Dropdown.jsx';
 import MenuIcon from '@assets/icon-menu.svg';
 
 export default function Header() {
+  const { user } = useAuthStore();
+  const { pathname } = useLocation();
   const [isSideBarOpen, setIsSideBarOpen] = useState(false);
 
   const toggleSideBar = () => {
     setIsSideBarOpen(!isSideBarOpen);
   };
+
+  useEffect(() => {
+    setIsSideBarOpen(false);
+  }, [pathname]);
 
   return (
     <>
@@ -35,7 +44,21 @@ export default function Header() {
               </Link>
             </div>
           </div>
-          <LoginButton />
+          {user ? (
+            <Dropdown
+              anchor='bottom end'
+              items={[
+                {
+                  content: '로그아웃',
+                  onClick: () => supabase.auth.signOut(),
+                },
+              ]}
+            >
+              <p className='font-bold text-xl'>{user.nickname} 님</p>
+            </Dropdown>
+          ) : (
+            <LoginButton />
+          )}
         </div>
       </nav>
 
@@ -61,20 +84,35 @@ export default function Header() {
           <div className='fixed top-0 left-0 z-20 w-8/12 h-screen bg-white sm:hidden'>
             <div className='flex flex-col items-start p-10'>
               <div className='flex items-center h-[88px]'>
-                <LoginButton />
+                {user ? (
+                  <p className='font-bold text-xl'>{user.nickname} 님</p>
+                ) : (
+                  <LoginButton />
+                )}
               </div>
               <Link to='/' className='flex items-center h-[70px] text-xl'>
                 게시판
               </Link>
-              <button
+              <div
                 onClick={() => {
                   showModal();
                   toggleSideBar();
                 }}
-                className='flex items-center h-[70px] text-xl'
+                className='flex items-center h-[70px] text-xl cursor-pointer'
               >
                 대시보드(모바일 불가)
-              </button>
+              </div>
+              {user && (
+                <div
+                  onClick={() => {
+                    supabase.auth.signOut();
+                    toggleSideBar();
+                  }}
+                  className='flex items-center h-[70px] text-xl text-slate-400 cursor-pointer'
+                >
+                  로그아웃
+                </div>
+              )}
             </div>
           </div>
         </>
