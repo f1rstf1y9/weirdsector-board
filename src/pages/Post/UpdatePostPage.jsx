@@ -33,6 +33,7 @@ function UpdatePostPage() {
         const post = postData[0];
         setTitle(post.title);
         setContent(post.content);
+        setFile({ isExisting: true, name: post.attachment_name });
 
         const { data: hashtagsData, error: hashtagsError } = await supabase
           .from('post_hashtags')
@@ -67,7 +68,99 @@ function UpdatePostPage() {
     fetchPostData();
   }, [postId, navigate]);
 
-  const handleSubmit = () => {};
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const hashtags = hashtag
+      .split(' ')
+      .join('')
+      .split('#')
+      .filter((tag) => tag.trim() !== '');
+
+    try {
+      if (user) {
+        let filePath = null;
+        if (!file?.isExisting) {
+          const fileExt = file.name.split('.').pop();
+          const fileName = `${user.id}_${Date.now()}.${fileExt}`;
+          const { data: fileData, error: fileError } = await supabase.storage
+            .from('attachments')
+            .upload(`public/${fileName}`, file);
+
+          if (fileError) {
+            throw fileError;
+          }
+          filePath = fileData.path;
+        }
+
+        const { error: postError } = await supabase
+          .from('posts')
+          .update({
+            title,
+            content,
+            ...(!file?.isExisting && {
+              attachment: filePath ? filePath : '',
+              attachment_name: file ? file.name : '',
+            }),
+          })
+          .eq('post_id', postId);
+
+        if (postError) {
+          throw postError;
+        }
+
+        const { error: deleteError } = await supabase
+          .from('post_hashtags')
+          .delete()
+          .eq('post_id', postId);
+
+        if (deleteError) {
+          throw deleteError;
+        }
+
+        for (const hashtag of hashtags) {
+          const { data: existingHashtags, error: hashtagError } = await supabase
+            .from('hashtags')
+            .select('id')
+            .eq('hashtag', hashtag)
+            .select();
+
+          let hashtagID;
+          if (existingHashtags && existingHashtags.length > 0) {
+            hashtagID = existingHashtags[0].hashtag_id;
+          } else {
+            const { data: newHashtag, error: newHashtagError } = await supabase
+              .from('hashtags')
+              .insert({ hashtag })
+              .select();
+
+            if (newHashtagError) {
+              throw newHashtagError;
+            }
+
+            hashtagID = newHashtag[0].hashtag_id;
+          }
+
+          const { error: relationError } = await supabase
+            .from('post_hashtags')
+            .insert({
+              post_id: postId,
+              hashtag_id: hashtagID,
+            });
+
+          if (relationError) {
+            throw relationError;
+          }
+        }
+
+        navigate(`/${board}/${postId}`);
+      } else {
+        console.error('인증되지 않은 사용자입니다.');
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <>
