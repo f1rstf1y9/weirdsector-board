@@ -192,9 +192,8 @@ function CreatePostPage() {
                 onChange={(e) => setFile(e.target.files[0])}
                 type='file'
                 id='attachment'
-                className='w-0 flex-0'
+                className='hidden'
                 disabled={file}
-                style={{ display: 'none' }}
               />
             </div>
             <div className='flex gap-[20px] items-center'>
