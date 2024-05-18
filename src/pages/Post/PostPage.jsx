@@ -17,6 +17,8 @@ function PostPage() {
   const [attachmentUrl, setAttachmentUrl] = useState('');
 
   useEffect(() => {
+    let isMounted = true;
+
     const fetchPostData = async () => {
       try {
         const { data: postData, error: postError } = await supabase
@@ -31,54 +33,55 @@ function PostPage() {
         }
 
         const post = postData[0];
-        setPostObj(post);
 
-        await supabase
-          .from('posts')
-          .update({ view_counts: post.view_counts + 1 })
-          .eq('post_id', postId);
+        if (isMounted) {
+          setPostObj(post);
 
-        const { data: hashtagsData, error: hashtagsError } = await supabase
-          .from('post_hashtags')
-          .select('hashtag_id')
-          .eq('post_id', postId);
+          await supabase
+            .from('posts')
+            .update({ view_counts: post.view_counts + 1 })
+            .eq('post_id', postId);
 
-        if (hashtagsError) {
-          throw hashtagsError;
-        }
+          const { data: hashtagsData, error: hashtagsError } = await supabase
+            .from('post_hashtags')
+            .select('hashtag_id')
+            .eq('post_id', postId);
 
-        const hashtagPromises = hashtagsData.map(async (hashtagRelation) => {
-          const { data: hashtagData, error: hashtagError } = await supabase
-            .from('hashtags')
-            .select('hashtag')
-            .eq('hashtag_id', hashtagRelation.hashtag_id)
-            .select();
-
-          if (hashtagError) {
-            throw hashtagError;
+          if (hashtagsError) {
+            throw hashtagsError;
           }
 
-          return hashtagData[0].hashtag;
-        });
+          const hashtagPromises = hashtagsData.map(async (hashtagRelation) => {
+            const { data: hashtagData, error: hashtagError } = await supabase
+              .from('hashtags')
+              .select('hashtag')
+              .eq('hashtag_id', hashtagRelation.hashtag_id)
+              .select();
 
-        const resolvedHashtags = await Promise.all(hashtagPromises);
-        setHashtags(resolvedHashtags);
+            if (hashtagError) {
+              throw hashtagError;
+            }
 
-        console.log(post.attachment);
-        if (post.attachment) {
-          const { data: attachmentData, error: attachmentError } =
-            supabase.storage
-              .from('attachments')
-              .getPublicUrl(post.attachment, { download: true });
+            return hashtagData[0].hashtag;
+          });
 
-          if (attachmentError) {
-            throw attachmentError;
+          const resolvedHashtags = await Promise.all(hashtagPromises);
+          setHashtags(resolvedHashtags);
+
+          if (post.attachment) {
+            const { data: attachmentData, error: attachmentError } =
+              supabase.storage
+                .from('attachments')
+                .getPublicUrl(post.attachment, { download: true });
+
+            if (attachmentError) {
+              throw attachmentError;
+            }
+
+            setAttachmentUrl(attachmentData.publicUrl);
+          } else {
+            console.error('Attachment is undefined or empty.');
           }
-
-          console.log('Public URL:', attachmentData);
-          setAttachmentUrl(attachmentData.publicUrl);
-        } else {
-          console.error('Attachment is undefined or empty.');
         }
       } catch (error) {
         console.error('Failed to fetch post data:', error);
@@ -86,6 +89,10 @@ function PostPage() {
     };
 
     fetchPostData();
+
+    return () => {
+      isMounted = false;
+    };
   }, [postId, navigate]);
 
   return (
