@@ -1,19 +1,114 @@
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import useBoardValidation from '@hook/useBoardValidation';
+import { useAuthStore } from '@store/store.js';
+import { supabase } from '../../supabase';
 
 import Button from '@components/Button.jsx';
 
 function CreatePostPage() {
+  const navigate = useNavigate();
   const { board } = useParams();
+  const { user } = useAuthStore();
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [file, setFile] = useState(null);
+  const [hashtag, setHashtag] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const hashtags = hashtag
+      .split(' ')
+      .join('')
+      .split('#')
+      .filter((tag) => tag.trim() !== '');
+
+    try {
+      if (user) {
+        let filePath = null;
+        if (file) {
+          const fileExt = file.name.split('.').pop();
+          const fileName = `${user.id}_${Date.now()}.${fileExt}`;
+          const { data: fileData, error: fileError } = await supabase.storage
+            .from('attachments')
+            .upload(`public/${fileName}`, file);
+
+          if (fileError) {
+            throw fileError;
+          }
+          filePath = fileData.path;
+        }
+
+        const { data: postData, error: postError } = await supabase
+          .from('posts')
+          .insert([
+            {
+              user_id: user.id,
+              user_nickname: user.nickname,
+              created_at: new Date().toISOString(),
+              board,
+              title,
+              content,
+              attachment: filePath ? filePath : '',
+              attachment_name: file ? file.name : '',
+              view_counts: 0,
+            },
+          ])
+          .select();
+
+        if (postError) {
+          throw postError;
+        }
+
+        for (const hashtag of hashtags) {
+          const { data: existingHashtags, error: hashtagError } = await supabase
+            .from('hashtags')
+            .select('id')
+            .eq('hashtag', hashtag)
+            .select();
+
+          let hashtagID;
+          if (existingHashtags && existingHashtags.length > 0) {
+            hashtagID = existingHashtags[0].hashtag_id;
+          } else {
+            const { data: newHashtag, error: newHashtagError } = await supabase
+              .from('hashtags')
+              .insert({ hashtag })
+              .select();
+
+            if (newHashtagError) {
+              throw newHashtagError;
+            }
+
+            hashtagID = newHashtag[0].hashtag_id;
+          }
+
+          const { error: relationError } = await supabase
+            .from('post_hashtags')
+            .insert({ post_id: postData[0].post_id, hashtag_id: hashtagID });
+
+          if (relationError) {
+            throw relationError;
+          }
+        }
+        navigate(`/${board}/${postData[0].post_id}`);
+      } else {
+        console.error('인증되지 않은 사용자입니다.');
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <>
       <div className='flex justify-center w-full'>
-        <div className='flex flex-col w-full sm:w-[1144px] items-center justify-center gap-[40px] my-[80px] sm:my-[100px]'>
+        <form
+          onSubmit={handleSubmit}
+          className='flex flex-col w-full sm:w-[1144px] items-center justify-center gap-[40px] my-[80px] sm:my-[100px]'
+        >
           <h1 className='text-center text-[26px] sm:text-[32px] font-bold'>
             게시글 작성
           </h1>
@@ -29,6 +124,7 @@ function CreatePostPage() {
                 }}
                 type='text'
                 className='h-[55px] flex-1 bg-white rounded border border-[#E1E1E1] focus:border-black focus:!border-black px-5 py-3.5 flex gap-4'
+                required
               />
             </div>
             <div className='flex gap-[20px] items-start'>
@@ -41,6 +137,7 @@ function CreatePostPage() {
                   setContent(e.target.value);
                 }}
                 className='flex-1 min-h-80 bg-white rounded border border-[#E1E1E1] focus:border-black px-5 py-4 flex gap-4'
+                required
               />
             </div>
             <div className='flex items-center'>
@@ -49,17 +146,65 @@ function CreatePostPage() {
               </p>
               <label
                 htmlFor='attachment'
-                className='flex-1 h-[55px] bg-white rounded border border-[#E1E1E1] px-5 py-4 flex gap-4 cursor-pointer'
+                className={`flex items-center justify-between flex-1 h-[55px] bg-white rounded border border-[#E1E1E1] px-5 py-4 flex gap-4 ${!file && 'cursor-pointer'}`}
               >
-                파일 선택
+                <span>{file ? file.name : '파일 선택'}</span>
+                <div
+                  className='cursor-pointer'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    setFile(null);
+                  }}
+                >
+                  {file && (
+                    <svg
+                      width='24px'
+                      height='24px'
+                      viewBox='0 0 24 24'
+                      fill='none'
+                      xmlns='http://www.w3.org/2000/svg'
+                      style={{ pointerEvents: 'none' }}
+                    >
+                      <g id='SVGRepo_bgCarrier' stroke-width='0'></g>
+                      <g
+                        id='SVGRepo_tracerCarrier'
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
+                      ></g>
+                      <g id='SVGRepo_iconCarrier'>
+                        <g id='Menu / Close_MD'>
+                          <path
+                            id='Vector'
+                            d='M18 18L12 12M12 12L6 6M12 12L18 6M12 12L6 18'
+                            stroke='#000000'
+                            strokeWidth='2'
+                            strokeLinecap='round'
+                            strokeLinejoin='round'
+                          ></path>
+                        </g>
+                      </g>
+                    </svg>
+                  )}
+                </div>
               </label>
-              <input type='file' id='attachment' className='w-0 flex-0' />
+              <input
+                onChange={(e) => setFile(e.target.files[0])}
+                type='file'
+                id='attachment'
+                className='w-0 flex-0'
+                disabled={file}
+                style={{ display: 'none' }}
+              />
             </div>
             <div className='flex gap-[20px] items-center'>
               <p className='w-[60px] sm:w-[140px] text-sm sm:text-xl font-bold'>
                 해시태그
               </p>
               <input
+                placeholder={`'#'으로 해시태그를 구분해주세요.`}
+                value={hashtag}
+                onChange={(e) => setHashtag(e.target.value)}
                 type='text'
                 className='h-[55px] flex-1 bg-white rounded border border-[#E1E1E1] focus:border-black focus:!border-black px-5 py-3.5 flex gap-4'
               />
@@ -68,7 +213,7 @@ function CreatePostPage() {
           <Button width='w-[143px] sm:w-[162px]' height='h-[45px] sm:h-[48px]'>
             게시글 작성
           </Button>
-        </div>
+        </form>
       </div>
     </>
   );
