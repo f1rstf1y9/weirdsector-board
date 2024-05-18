@@ -17,22 +17,27 @@ function BoardPage() {
       <div className='w-full flex flex-col items-center'>
         <div className='flex flex-col items-center mt-[80px] sm:mt-[100px] mb-[80px]'>
           <p className='text-base sm:text-xl text-red font-bold mb-2'>board</p>
-          <h1 className='text-[26px] sm:text-[32px] font-bold'>자유게시판</h1>
+          <h1 className='text-[26px] sm:text-[32px] font-bold'>
+            {board === 'free'
+              ? '자유 게시판'
+              : board === 'qna'
+                ? '질문 게시판'
+                : '기타 게시판'}
+          </h1>
         </div>
         <div className='flex flex-col items-center w-full mb-[80px] sm:mb-[100px]'>
           <div className='flex mb-[40px] sm:gap-3'>
-            <BoardTab isSelected={true} position='left'>
+            <BoardTab isSelected={board === 'free'} position='left' path='free'>
               자유 게시판
             </BoardTab>
-            <BoardTab isSelected={false} position='center'>
+            <BoardTab isSelected={board === 'qna'} position='center' path='qna'>
               질문 게시판
             </BoardTab>
-            <BoardTab isSelected={false} position='right'>
+            <BoardTab isSelected={board === 'etc'} position='right' path='etc'>
               기타 게시판
             </BoardTab>
           </div>
           <ul className='mb-[20px] w-full'>
-            {' '}
             <BoardTable
               id='No'
               title='제목'
