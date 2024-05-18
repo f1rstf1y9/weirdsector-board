@@ -1,8 +1,12 @@
 import { useState } from 'react';
+import { useParams } from 'react-router-dom';
+import useBoardValidation from '@hook/useBoardValidation';
 
 import Button from '@components/Button.jsx';
 
-export default function CreatePostPage() {
+function CreatePostPage() {
+  const { board } = useParams();
+
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
 
@@ -69,3 +73,5 @@ export default function CreatePostPage() {
     </>
   );
 }
+
+export default useBoardValidation(CreatePostPage);

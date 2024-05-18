@@ -81,6 +81,10 @@ function App() {
         },
         {
           path: '*',
+          element: <Navigate to='/404' replace />,
+        },
+        {
+          path: '/404',
           element: <NotFoundPage />,
         },
       ],

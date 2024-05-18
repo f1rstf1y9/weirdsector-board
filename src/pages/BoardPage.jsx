@@ -1,11 +1,15 @@
 import { useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import useBoardValidation from '@hook/useBoardValidation';
 
 import BoardTable from '@components/BoardTable';
 import BoardTab from '@components/BoardTab';
 import BoardPagination from '@components/BoardPagination';
 import Button from '@components/Button';
 
-export default function BoardPage() {
+function BoardPage() {
+  const { board } = useParams();
+
   const navigate = useNavigate();
 
   return (
@@ -62,3 +66,5 @@ export default function BoardPage() {
     </>
   );
 }
+
+export default useBoardValidation(BoardPage);
