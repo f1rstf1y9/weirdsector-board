@@ -3,6 +3,8 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import useBoardValidation from '@hook/useBoardValidation';
 import { useAuthStore } from '@store/store.js';
 import { supabase } from '../../supabase';
+import { formatDistanceToNow, parseISO } from 'date-fns';
+import { ko } from 'date-fns/locale';
 
 import Dropdown from '@components/Dropdown.jsx';
 import Button from '@components/Button.jsx';
@@ -95,6 +97,11 @@ function PostPage() {
     };
   }, [postId, navigate]);
 
+  const formatTimestamp = (timestamp) => {
+    const date = parseISO(timestamp);
+    return formatDistanceToNow(date, { addSuffix: true, locale: ko });
+  };
+
   return (
     <>
       <div className='w-full flex justify-center sm:text-[20px]'>
@@ -154,7 +161,7 @@ function PostPage() {
             <div className='flex items-center gap-[10px] text-sm sm:text-base'>
               <p>{postObj?.user_nickname}</p>
               <div className='w-1 h-[18px] border-r border-r-[#E1E1E1]'></div>
-              <p>{postObj?.created_at}</p>
+              <p>{postObj && formatTimestamp(postObj?.created_at)}</p>
               <div className='w-1 h-[18px] border-r border-r-[#E1E1E1]'></div>
               <p>조회수 {postObj?.view_counts}</p>
             </div>
