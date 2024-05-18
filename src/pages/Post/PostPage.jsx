@@ -136,7 +136,9 @@ function PostPage() {
                 items={[
                   {
                     content: '수정',
-                    onClick: () => {},
+                    onClick: () => {
+                      navigate('update');
+                    },
                   },
                   {
                     content: '삭제',
