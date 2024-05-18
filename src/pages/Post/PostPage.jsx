@@ -33,6 +33,11 @@ function PostPage() {
         const post = postData[0];
         setPostObj(post);
 
+        await supabase
+          .from('posts')
+          .update({ view_counts: post.view_counts + 1 })
+          .eq('post_id', postId);
+
         const { data: hashtagsData, error: hashtagsError } = await supabase
           .from('post_hashtags')
           .select('hashtag_id')
