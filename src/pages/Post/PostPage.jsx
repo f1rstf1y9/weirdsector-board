@@ -1,7 +1,12 @@
+import { useParams } from 'react-router-dom';
+import useBoardValidation from '@hook/useBoardValidation';
+
 import Dropdown from '@components/Dropdown.jsx';
 import Button from '@components/Button.jsx';
 
-export default function PostPage() {
+function PostPage() {
+  const { board } = useParams();
+
   return (
     <>
       <div className='w-full flex justify-center sm:text-[20px]'>
@@ -167,3 +172,5 @@ export default function PostPage() {
     </>
   );
 }
+
+export default useBoardValidation(PostPage);

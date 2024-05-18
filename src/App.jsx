@@ -1,4 +1,8 @@
-import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import {
+  RouterProvider,
+  createBrowserRouter,
+  Navigate,
+} from 'react-router-dom';
 import { useEffect } from 'react';
 import { supabase } from './supabase';
 import { useAuthStore } from '@store/store.js';
@@ -45,7 +49,7 @@ function App() {
       children: [
         {
           path: '',
-          element: <BoardPage />,
+          element: <Navigate to='/free' replace />,
         },
         {
           path: ':board',
@@ -77,6 +81,10 @@ function App() {
         },
         {
           path: '*',
+          element: <Navigate to='/404' replace />,
+        },
+        {
+          path: '/404',
           element: <NotFoundPage />,
         },
       ],
