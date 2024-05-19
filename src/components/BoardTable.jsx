@@ -23,7 +23,7 @@ export default function BoardTable({
           <div className='shrink-0 flex justify-center items-center w-[60px] sm:w-[80px] md:w-[120px] lg:w-[160px] p-[11px]'>
             <p className='truncate'>{nickname}</p>
           </div>
-          <div className='shrink-0 hidden sm:flex justify-center items-center sm:w-[80px] md:w-[120px] lg:w-[160px] p-[12px]'>
+          <div className='shrink-0 hidden sm:flex justify-center items-center sm:w-[140px] lg:w-[160px] p-[12px]'>
             {created_at}
           </div>
           <div className='shrink-0 hidden sm:flex justify-center items-center sm:w-[80px] md:w-[120px] lg:w-[160px] p-[12px]'>

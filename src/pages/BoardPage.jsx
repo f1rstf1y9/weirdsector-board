@@ -97,44 +97,52 @@ function BoardPage() {
               기타 게시판
             </BoardTab>
           </div>
-          <ul className='mb-[20px] w-full'>
-            <BoardTable
-              id='No'
-              title='제목'
-              nickname='글쓴이'
-              created_at='작성시간'
-              view_count='조회수'
-              type='head'
-            />
-            {displayedPosts.map((post) => (
-              <BoardTable
-                key={post.post_id}
-                id={post.post_id}
-                title={post.title}
-                nickname={post.user_nickname}
-                created_at={formatTimestamp(post.created_at)}
-                view_count={post.view_counts}
-              />
-            ))}
-          </ul>
-          <div className='w-full flex items-start justify-center relative h-[106px] lg:h-[48px]'>
-            <BoardPagination
-              totalPages={totalPages}
-              currentPage={currentPage}
-              setCurrentPage={handlePageChange}
-            />
-            <div className='absolute bottom-0 lg:top-0 right-0'>
-              {user && (
-                <Button
-                  width='w-[127px]'
-                  height='h-[48px]'
-                  onClick={() => navigate('create-post')}
-                >
-                  글쓰기
-                </Button>
-              )}
+          {displayedPosts.length ? (
+            <>
+              <ul className='mb-[20px] w-full'>
+                <BoardTable
+                  id='No'
+                  title='제목'
+                  nickname='글쓴이'
+                  created_at='작성시간'
+                  view_count='조회수'
+                  type='head'
+                />
+                {displayedPosts.map((post) => (
+                  <BoardTable
+                    key={post.post_id}
+                    id={post.post_id}
+                    title={post.title}
+                    nickname={post.user_nickname}
+                    created_at={formatTimestamp(post.created_at)}
+                    view_count={post.view_counts}
+                  />
+                ))}
+              </ul>
+              <div className='w-full flex items-start justify-center relative h-[106px] lg:h-[48px]'>
+                <BoardPagination
+                  totalPages={totalPages}
+                  currentPage={currentPage}
+                  setCurrentPage={handlePageChange}
+                />
+                <div className='absolute bottom-0 lg:top-0 right-0'>
+                  {user && (
+                    <Button
+                      width='w-[127px]'
+                      height='h-[48px]'
+                      onClick={() => navigate('create-post')}
+                    >
+                      글쓰기
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className='flex items-center justify-center w-full h-[200px]'>
+              게시글이 없어요 :(
             </div>
-          </div>
+          )}
         </div>
       </div>
     </>

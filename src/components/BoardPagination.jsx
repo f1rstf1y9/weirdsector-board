@@ -30,7 +30,7 @@ export default function BoardPagination({
         currentPage={currentPage}
         middlePagesSiblingCount={siblingCount}
         setCurrentPage={handlePageChange}
-        className='flex w-[290px] sm:w-[395px] justify-between'
+        className='flex'
         truncableText='...'
         truncableClassName=''
       >
@@ -52,7 +52,7 @@ export default function BoardPagination({
           </svg>
         </Pagination.PrevButton>
 
-        <nav className='flex justify-center text-sm'>
+        <nav className='flex justify-center text-sm px-[24px]'>
           <ul className='flex items-center gap-4'>
             <Pagination.PageButton
               activeClassName='text-red'
