@@ -17,6 +17,12 @@ function UpdatePostPage() {
   const [hashtag, setHashtag] = useState('');
 
   useEffect(() => {
+    if (!user) {
+      navigate('/');
+    }
+  }, [user, navigate]);
+
+  useEffect(() => {
     const fetchPostData = async () => {
       try {
         const { data: postData, error: postError } = await supabase

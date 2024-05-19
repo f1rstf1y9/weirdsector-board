@@ -23,6 +23,12 @@ export default function SignUpPage() {
   const [checkErr, setCheckErr] = useState('');
 
   useEffect(() => {
+    if (user) {
+      navigate('/');
+    }
+  }, [user, navigate]);
+
+  useEffect(() => {
     if (checkErr) {
       setCheckErr('');
     }
