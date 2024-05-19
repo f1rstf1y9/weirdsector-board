@@ -1,6 +1,10 @@
-import { useNavigate } from 'react-router-dom';
-import { useParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import useBoardValidation from '@hook/useBoardValidation';
+import { useAuthStore } from '@store/store.js';
+import { supabase } from '../supabase';
+import { formatDistanceToNow, parseISO } from 'date-fns';
+import { ko } from 'date-fns/locale';
 
 import BoardTable from '@components/BoardTable';
 import BoardTab from '@components/BoardTab';
@@ -9,8 +13,64 @@ import Button from '@components/Button';
 
 function BoardPage() {
   const { board } = useParams();
+  const { user } = useAuthStore();
 
   const navigate = useNavigate();
+
+  const [totalPages, setTotalPages] = useState(0);
+  const [displayedPosts, setDisplayedPosts] = useState([]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const postsPerPage = 10;
+
+  useEffect(() => {
+    setCurrentPage(0);
+    const fetchTotalPostsCount = async () => {
+      const { count, error } = await supabase
+        .from('posts')
+        .select('count', { count: 'exact' })
+        .eq('board', board);
+      if (error) {
+        console.error('Error fetching total posts count:', error.message);
+      } else {
+        const totalPostsCount = count ?? 0;
+        const calculatedTotalPages = Math.ceil(totalPostsCount / postsPerPage);
+        setTotalPages(calculatedTotalPages);
+      }
+    };
+
+    fetchTotalPostsCount();
+  }, [board]);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      const { data: posts, error } = await supabase
+        .from('posts')
+        .select('*')
+        .eq('board', board)
+        .order('created_at', { ascending: false })
+        .range(
+          currentPage * postsPerPage,
+          (currentPage + 1) * postsPerPage - 1
+        );
+
+      if (error) {
+        console.error('Error fetching posts:', error.message);
+      } else {
+        setDisplayedPosts(posts);
+      }
+    };
+
+    fetchPosts();
+  }, [board, currentPage]);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const formatTimestamp = (timestamp) => {
+    const date = parseISO(timestamp);
+    return formatDistanceToNow(date, { addSuffix: true, locale: ko });
+  };
 
   return (
     <>
@@ -46,24 +106,33 @@ function BoardPage() {
               view_count='조회수'
               type='head'
             />
-            <BoardTable
-              id='1'
-              title='국가유공자·상이군경 및 전몰군경의 유가족은 법률이 정하는 바에 의하여 우선적으로 근로의 기회를 부여받는다.'
-              nickname='홍길동'
-              created_at='2020.01.29'
-              view_count='124'
-            />
+            {displayedPosts.map((post) => (
+              <BoardTable
+                key={post.post_id}
+                id={post.post_id}
+                title={post.title}
+                nickname={post.user_nickname}
+                created_at={formatTimestamp(post.created_at)}
+                view_count={post.view_counts}
+              />
+            ))}
           </ul>
           <div className='w-full flex items-start justify-center relative h-[106px] lg:h-[48px]'>
-            <BoardPagination totalPages={13} />
+            <BoardPagination
+              totalPages={totalPages}
+              currentPage={currentPage}
+              setCurrentPage={handlePageChange}
+            />
             <div className='absolute bottom-0 lg:top-0 right-0'>
-              <Button
-                width='w-[127px]'
-                height='h-[48px]'
-                onClick={() => navigate('create-post')}
-              >
-                글쓰기
-              </Button>
+              {user && (
+                <Button
+                  width='w-[127px]'
+                  height='h-[48px]'
+                  onClick={() => navigate('create-post')}
+                >
+                  글쓰기
+                </Button>
+              )}
             </div>
           </div>
         </div>
