@@ -193,7 +193,7 @@ function UpdatePostPage() {
                   setTitle(e.target.value);
                 }}
                 type='text'
-                className='h-[55px] flex-1 bg-white rounded border border-[#E1E1E1] focus:border-black focus:!border-black px-5 py-3.5 flex gap-4'
+                className='min-w-0 h-[55px] flex-1 bg-white rounded border border-[#E1E1E1] focus:border-black focus:!border-black px-5 py-3.5 flex gap-4'
                 required
               />
             </div>
@@ -275,7 +275,7 @@ function UpdatePostPage() {
                 value={hashtag}
                 onChange={(e) => setHashtag(e.target.value)}
                 type='text'
-                className='h-[55px] flex-1 bg-white rounded border border-[#E1E1E1] focus:border-black focus:!border-black px-5 py-3.5 flex gap-4'
+                className='min-w-0 h-[55px] flex-1 bg-white rounded border border-[#E1E1E1] focus:border-black focus:!border-black px-5 py-3.5 flex gap-4'
               />
             </div>
           </div>
