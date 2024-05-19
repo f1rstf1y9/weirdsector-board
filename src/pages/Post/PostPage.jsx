@@ -8,6 +8,7 @@ import { ko } from 'date-fns/locale';
 
 import Dropdown from '@components/Dropdown.jsx';
 import Button from '@components/Button.jsx';
+import Modal from '@components/Modal';
 
 function PostPage() {
   const navigate = useNavigate();
@@ -19,6 +20,8 @@ function PostPage() {
   const [attachmentUrl, setAttachmentUrl] = useState('');
   const [comment, setComment] = useState('');
   const [comments, setComments] = useState([]);
+  const [isPostModalOpen, setIsPostModalOpen] = useState(false);
+  const [commentModalId, setcommentModalId] = useState(null);
 
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
@@ -148,6 +151,53 @@ function PostPage() {
     return formatDistanceToNow(date, { addSuffix: true, locale: ko });
   };
 
+  const handlePostDelete = async () => {
+    try {
+      if (user && postObj && user.id === postObj.user_id) {
+        const { error } = await supabase
+          .from('posts')
+          .delete()
+          .eq('post_id', postId);
+        if (error) {
+          throw error;
+        }
+        navigate(`/${board}`);
+      } else {
+        console.error('You are not authorized to delete this post.');
+      }
+    } catch (error) {
+      console.error('Failed to delete post:', error);
+    } finally {
+      setIsPostModalOpen(false);
+    }
+  };
+
+  const handleCommentDelete = async () => {
+    try {
+      if (user && commentModalId) {
+        const comment = comments.find(
+          (comment) => comment.comment_id === commentModalId
+        );
+        if (comment && user.id === comment.user_id) {
+          const { error } = await supabase
+            .from('comments')
+            .delete()
+            .eq('comment_id', commentModalId);
+          if (error) {
+            throw error;
+          }
+          fetchCommentsData();
+        } else {
+          console.error('You are not authorized to delete this comment.');
+        }
+      }
+    } catch (error) {
+      console.error('Failed to delete comment:', error);
+    } finally {
+      setcommentModalId(null);
+    }
+  };
+
   return (
     <>
       <div className='w-full flex justify-center sm:text-[20px]'>
@@ -190,7 +240,9 @@ function PostPage() {
                       },
                       {
                         content: '삭제',
-                        onClick: () => {},
+                        onClick: () => {
+                          setIsPostModalOpen(true);
+                        },
                       },
                     ]}
                   >
@@ -285,7 +337,9 @@ function PostPage() {
                           },
                           {
                             content: '삭제',
-                            onClick: () => {},
+                            onClick: () => {
+                              setcommentModalId(comment.comment_id);
+                            },
                           },
                         ]}
                       >
@@ -315,6 +369,24 @@ function PostPage() {
           ))}
         </div>
       </div>
+
+      <Modal
+        isOpen={isPostModalOpen}
+        onClose={() => setIsPostModalOpen(false)}
+        onConfirm={handlePostDelete}
+        title='게시글 삭제'
+        message='해당 게시글을 삭제하시겠습니까?'
+        isDelete={true}
+      />
+
+      <Modal
+        isOpen={commentModalId}
+        onClose={() => setcommentModalId(null)}
+        onConfirm={handleCommentDelete}
+        title='댓글 삭제'
+        message='해당 댓글을 삭제하시겠습니까?'
+        isDelete={true}
+      />
     </>
   );
 }
