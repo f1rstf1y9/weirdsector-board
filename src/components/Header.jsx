@@ -5,12 +5,14 @@ import { useAuthStore } from '../store/store.js';
 
 import LoginButton from '@components/LoginButton.jsx';
 import Dropdown from '@components/Dropdown.jsx';
+import Modal from '@components/Modal';
 import MenuIcon from '@assets/icon-menu.svg';
 
 export default function Header() {
   const { user } = useAuthStore();
   const { pathname } = useLocation();
   const [isSideBarOpen, setIsSideBarOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const toggleSideBar = () => {
     setIsSideBarOpen(!isSideBarOpen);
@@ -95,7 +97,7 @@ export default function Header() {
               </Link>
               <div
                 onClick={() => {
-                  showModal();
+                  setIsModalOpen(true);
                   toggleSideBar();
                 }}
                 className='flex items-center h-[70px] text-xl cursor-pointer'
@@ -117,6 +119,15 @@ export default function Header() {
           </div>
         </>
       )}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={() => setIsModalOpen(false)}
+        title='모바일에서 사용이 불가합니다.'
+        message={`대시보드는 모바일에서 사용이 불가하므로
+    PC 환경에서 접속해주세요. 감사합니다.`}
+        isDelete={false}
+      />
     </>
   );
 }
