@@ -204,12 +204,12 @@ function PostPage() {
           )}
 
           {user && (
-            <div className='flex gap-[20px]'>
+            <div className='w-100 flex gap-[20px] '>
               <input
                 required
-                className='h-[55px] flex-1 bg-white rounded border border-[#E1E1E1] focus:border-black focus:!border-black px-5 py-3.5 flex gap-4'
+                className='min-w-0 h-[55px] flex-1 shrink bg-white rounded border border-[#E1E1E1] focus:border-black focus:!border-black px-5 py-3.5 flex gap-4'
               ></input>
-              <Button width='w-[88px] sm:w-[142px]'>댓글 작성</Button>
+              <Button width='shrink-0 w-[88px] sm:w-[142px]'>댓글 작성</Button>
             </div>
           )}
 
