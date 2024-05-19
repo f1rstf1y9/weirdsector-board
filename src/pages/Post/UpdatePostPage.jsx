@@ -17,6 +17,12 @@ function UpdatePostPage() {
   const [hashtag, setHashtag] = useState('');
 
   useEffect(() => {
+    if (!user) {
+      navigate(`/${board}`);
+    }
+  }, [user, navigate]);
+
+  useEffect(() => {
     const fetchPostData = async () => {
       try {
         const { data: postData, error: postError } = await supabase
@@ -34,6 +40,10 @@ function UpdatePostPage() {
         setTitle(post.title);
         setContent(post.content);
         setFile({ isExisting: true, name: post.attachment_name });
+        if (user?.id !== post.user_id) {
+          navigate(`/${board}`);
+          return;
+        }
 
         const { data: hashtagsData, error: hashtagsError } = await supabase
           .from('post_hashtags')

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabase';
+import { useAuthStore } from '@store/store.js';
 
 import InputBox from '@components/InputBox';
 import Button from '@components/Button';
@@ -9,6 +10,7 @@ import ErrorIcon from '@assets/icon-error.svg';
 
 export default function SignUpPage() {
   const navigate = useNavigate();
+  const { user } = useAuthStore();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -21,6 +23,12 @@ export default function SignUpPage() {
   const [pwdCheckErr, setPwdCheckErr] = useState('');
   const [nicknameErr, setNicknameErr] = useState('');
   const [checkErr, setCheckErr] = useState('');
+
+  useEffect(() => {
+    if (user) {
+      navigate('/');
+    }
+  }, [user, navigate]);
 
   useEffect(() => {
     if (checkErr) {

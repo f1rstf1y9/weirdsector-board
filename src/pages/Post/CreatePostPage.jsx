@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import useBoardValidation from '@hook/useBoardValidation';
 import { useAuthStore } from '@store/store.js';
@@ -15,6 +15,12 @@ function CreatePostPage() {
   const [content, setContent] = useState('');
   const [file, setFile] = useState(null);
   const [hashtag, setHashtag] = useState('');
+
+  useEffect(() => {
+    if (!user) {
+      navigate(`/${board}`);
+    }
+  }, [user, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
