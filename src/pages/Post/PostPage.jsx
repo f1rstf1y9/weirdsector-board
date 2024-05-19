@@ -20,6 +20,30 @@ function PostPage() {
   const [comment, setComment] = useState('');
   const [comments, setComments] = useState([]);
 
+  const handleCommentSubmit = async (e) => {
+    e.preventDefault();
+
+    if (postObj) {
+      try {
+        const { error: commentError } = await supabase.from('comments').insert([
+          {
+            user_id: user.id,
+            user_nickname: user.nickname,
+            created_at: new Date().toISOString(),
+            content: comment,
+            post_id: postObj.post_id,
+          },
+        ]);
+        if (commentError) {
+          throw commentError;
+        }
+        navigate(0);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  };
+
   useEffect(() => {
     let isMounted = true;
 
@@ -233,7 +257,12 @@ function PostPage() {
                 required
                 className='min-w-0 h-[55px] flex-1 shrink bg-white rounded border border-[#E1E1E1] focus:border-black focus:!border-black px-5 py-3.5 flex gap-4'
               ></input>
-              <Button width='shrink-0 w-[88px] sm:w-[142px]'>댓글 작성</Button>
+              <Button
+                width='shrink-0 w-[88px] sm:w-[142px]'
+                onClick={handleCommentSubmit}
+              >
+                댓글 작성
+              </Button>
             </form>
           )}
 
