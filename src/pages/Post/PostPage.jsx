@@ -98,20 +98,21 @@ function PostPage() {
 
           const resolvedHashtags = await Promise.all(hashtagPromises);
           setHashtags(resolvedHashtags);
+          try {
+            if (post.attachment) {
+              const { data: attachmentData, error: attachmentError } =
+                supabase.storage
+                  .from('attachments')
+                  .getPublicUrl(post.attachment, { download: true });
 
-          if (post.attachment) {
-            const { data: attachmentData, error: attachmentError } =
-              supabase.storage
-                .from('attachments')
-                .getPublicUrl(post.attachment, { download: true });
+              if (attachmentError) {
+                throw attachmentError;
+              }
 
-            if (attachmentError) {
-              throw attachmentError;
+              setAttachmentUrl(attachmentData.publicUrl);
             }
-
-            setAttachmentUrl(attachmentData.publicUrl);
-          } else {
-            console.error('Attachment is undefined or empty.');
+          } catch (error) {
+            console.error('Failed to fetch post data:', error);
           }
         }
       } catch (error) {
@@ -327,7 +328,7 @@ function PostPage() {
                     {comment.user_nickname}
                   </p>
                   <div>
-                    {comment.user_id === user.id && (
+                    {comment.user_id === user?.id && (
                       <Dropdown
                         anchor='bottom end'
                         items={[
