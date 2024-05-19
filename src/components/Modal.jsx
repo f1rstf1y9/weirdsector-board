@@ -33,11 +33,13 @@ export default function Modal({
             onClick={(e) => {
               e.stopPropagation();
             }}
-            className='bg-white py-4 px-6 rounded-lg w-[358px] sm:w-[400px] h-[190px]'
+            className='bg-white py-4 px-6 rounded-lg w-[358px] sm:w-[400px] min-h-[190px]'
           >
             <div className='w-full flex flex-col items-center mt-4'>
               <p className='text-lg mb-4 font-bold'>{title}</p>
-              <p className='mb-4 text-[#414040]'>{message}</p>
+              <p className='mb-4 text-[#414040] text-center whitespace-pre-line'>
+                {message}
+              </p>
             </div>
 
             <div className='flex justify-end h-[72px] gap-[10px] pt-4'>
