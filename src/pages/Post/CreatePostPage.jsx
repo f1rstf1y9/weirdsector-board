@@ -18,7 +18,7 @@ function CreatePostPage() {
 
   useEffect(() => {
     if (!user) {
-      navigate('/');
+      navigate(`/${board}`);
     }
   }, [user, navigate]);
 
