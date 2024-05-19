@@ -1,9 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Pagination } from 'react-headless-pagination';
 
-export default function BoardPagination({ totalPages }) {
-  const [page, setPage] = useState(0);
+export default function BoardPagination({
+  totalPages,
+  currentPage,
+  setCurrentPage,
+}) {
   const [siblingCount, setSiblingCount] = useState(4);
+
   useEffect(() => {
     window.addEventListener('resize', () => {
       if (window.innerWidth < 640) {
@@ -13,8 +17,9 @@ export default function BoardPagination({ totalPages }) {
       }
     });
   }, [window.innerWidth]);
+
   const handlePageChange = (page) => {
-    setPage(page);
+    setCurrentPage(page);
   };
 
   return (
@@ -22,7 +27,7 @@ export default function BoardPagination({ totalPages }) {
       <Pagination
         totalPages={totalPages}
         edgePageCount={1}
-        currentPage={page}
+        currentPage={currentPage}
         middlePagesSiblingCount={siblingCount}
         setCurrentPage={handlePageChange}
         className='flex w-[290px] sm:w-[395px] justify-between'
@@ -68,9 +73,9 @@ export default function BoardPagination({ totalPages }) {
             <path
               d='M6.66667 16.3333L12.5 10.4999L6.66667 4.66659'
               stroke='black'
-              stroke-width='2'
-              stroke-linecap='round'
-              stroke-linejoin='round'
+              strokeWidth='2'
+              strokeLinecap='round'
+              strokeLinejoin='round'
             />
           </svg>
         </Pagination.NextButton>
