@@ -5,6 +5,7 @@ import { useAuthStore } from '@store/store.js';
 import { supabase } from '../../supabase';
 
 import Button from '@components/Button.jsx';
+import CloseIcon from '@assets/icon-close.svg';
 
 function UpdatePostPage() {
   const navigate = useNavigate();
@@ -227,35 +228,7 @@ function UpdatePostPage() {
                     setFile(null);
                   }}
                 >
-                  {file && (
-                    <svg
-                      width='24px'
-                      height='24px'
-                      viewBox='0 0 24 24'
-                      fill='none'
-                      xmlns='http://www.w3.org/2000/svg'
-                      style={{ pointerEvents: 'none' }}
-                    >
-                      <g id='SVGRepo_bgCarrier' strokeWidth='0'></g>
-                      <g
-                        id='SVGRepo_tracerCarrier'
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                      ></g>
-                      <g id='SVGRepo_iconCarrier'>
-                        <g id='Menu / Close_MD'>
-                          <path
-                            id='Vector'
-                            d='M18 18L12 12M12 12L6 6M12 12L18 6M12 12L6 18'
-                            stroke='#000000'
-                            strokeWidth='2'
-                            strokeLinecap='round'
-                            strokeLinejoin='round'
-                          ></path>
-                        </g>
-                      </g>
-                    </svg>
-                  )}
+                  {file && <img src={CloseIcon} alt='파일 첨부 취소' />}
                 </div>
               </label>
               <input
