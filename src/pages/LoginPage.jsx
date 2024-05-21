@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { supabase } from '../supabase';
 import { useAuthStore } from '../store/store.js';
 
@@ -25,7 +26,6 @@ export default function LoginPage() {
 
   const loginHandler = async (e) => {
     e.preventDefault();
-
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email,
@@ -33,11 +33,17 @@ export default function LoginPage() {
       });
 
       if (error) {
-        console.error(error);
+        throw error;
       } else {
+        toast.success('로그인에 성공했습니다.');
         navigate('/');
       }
     } catch (error) {
+      if (error.message === 'Invalid login credentials') {
+        toast.error('아이디와 비밀번호를 확인해주세요.');
+      } else {
+        toast.error('로그인에 실패했습니다.');
+      }
       console.error(error);
     }
   };
