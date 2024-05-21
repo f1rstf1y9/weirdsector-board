@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { supabase } from '../supabase';
 import { useAuthStore } from '@store/store.js';
 
@@ -106,9 +107,11 @@ export default function SignUpPage() {
           setEmailErr('이미 가입된 이메일입니다.');
         }
       } else {
+        toast.success('회원가입에 성공했습니다.');
         navigate('/signup-complete');
       }
     } catch (error) {
+      toast.success('회원가입에 실패했습니다. 다시 시도해주세요.');
       console.error(error);
     }
   };
