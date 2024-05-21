@@ -298,7 +298,6 @@ function PostPage() {
               key={comment.comment_id}
               comment={comment}
               user={user}
-              comments={comments}
               setComments={setComments}
               formatTimestamp={formatTimestamp}
             ></Comment>

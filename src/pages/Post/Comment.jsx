@@ -8,7 +8,6 @@ import Modal from '@components/Modal';
 export default function Comment({
   comment,
   user,
-  comments,
   setComments,
   formatTimestamp,
 }) {
