@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import useBoardValidation from '@hook/useBoardValidation';
+import toast from 'react-hot-toast';
 import { useAuthStore } from '@store/store.js';
 import { supabase } from '../supabase';
 import { formatDistanceToNow, parseISO } from 'date-fns';
@@ -30,6 +31,7 @@ function BoardPage() {
         .select('count', { count: 'exact' })
         .eq('board', board);
       if (error) {
+        toast.error('게시판 로딩 중에 오류가 발생했습니다.');
         console.error('Error fetching total posts count:', error.message);
       } else {
         const totalPostsCount = count ?? 0;
@@ -54,6 +56,7 @@ function BoardPage() {
         );
 
       if (error) {
+        toast.error('게시판 로딩 중에 오류가 발생했습니다.');
         console.error('Error fetching posts:', error.message);
       } else {
         setDisplayedPosts(posts);
