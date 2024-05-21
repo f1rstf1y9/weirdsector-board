@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import useBoardValidation from '@hook/useBoardValidation';
 import { useAuthStore } from '@store/store.js';
 import { supabase } from '../../supabase';
+import toast from 'react-hot-toast';
 
 import Button from '@components/Button.jsx';
 import CloseIcon from '@assets/icon-close.svg';
@@ -72,6 +73,9 @@ function UpdatePostPage() {
         const resolvedHashtags = await Promise.all(hashtagPromises);
         setHashtag(resolvedHashtags.join(' '));
       } catch (error) {
+        toast.error(
+          '게시글 정보를 불러오는 중 오류가 발생했습니다. 다시 시도해주세요.'
+        );
         console.error('Failed to fetch post data:', error);
       }
     };
@@ -163,9 +167,12 @@ function UpdatePostPage() {
             throw relationError;
           }
         }
-
+        toast.success('게시글을 성공적으로 업데이트 했습니다.');
         navigate(`/${board}/${postId}`);
       } else {
+        toast.error(
+          '게시글 업데이트 중 오류가 발생했습니다. 다시 시도해주세요.'
+        );
         console.error('인증되지 않은 사용자입니다.');
       }
     } catch (error) {
