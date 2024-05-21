@@ -6,6 +6,7 @@ import {
 import { useEffect } from 'react';
 import { supabase } from './supabase';
 import { useAuthStore } from '@store/store.js';
+import { Toaster } from 'react-hot-toast';
 
 import Layout from '@components/Layout.jsx';
 import BoardPage from '@pages/BoardPage.jsx';
@@ -98,6 +99,7 @@ function App() {
   return (
     <>
       <RouterProvider router={router} />
+      <Toaster />
     </>
   );
 }
