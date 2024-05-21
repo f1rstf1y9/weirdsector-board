@@ -42,7 +42,7 @@ export default function LoginPage() {
       if (error.message === 'Invalid login credentials') {
         toast.error('아이디와 비밀번호를 확인해주세요.');
       } else {
-        toast.error('로그인에 실패했습니다.');
+        toast.error('로그인에 실패했습니다. 다시 시도해주세요.');
       }
       console.error(error);
     }

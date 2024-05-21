@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '../../supabase';
+import toast from 'react-hot-toast';
 
 import Dropdown from '@components/Dropdown.jsx';
 import Button from '@components/Button.jsx';
@@ -27,13 +28,15 @@ export default function Comment({
         if (error) {
           throw error;
         }
+        toast.success('댓글을 성공적으로 삭제했습니다.');
         setComments((prevComments) =>
           prevComments.filter((c) => c.comment_id !== comment.comment_id)
         );
       } else {
-        console.error('You are not authorized to delete this comment.');
+        toast.error('인증되지 않은 사용자입니다.');
       }
     } catch (error) {
+      toast.error('댓글 삭제 중 오류가 발생했습니다. 다시 시도해주세요.');
       console.error('Failed to delete comment:', error);
     } finally {
       setIsCommentModalOpen(false);
@@ -53,7 +56,7 @@ export default function Comment({
         if (commentError) {
           throw commentError;
         } else {
-          console.log('Comment updated successfully:', data);
+          toast.success('댓글을 성공적으로 업데이트했습니다.');
           setComments((prevComments) =>
             prevComments.map((c) =>
               c.comment_id === comment.comment_id
@@ -64,9 +67,10 @@ export default function Comment({
           setIsCommentUpdating(false);
         }
       } else {
-        console.error('You are not authorized to update this comment.');
+        toast.error('인증되지 않은 사용자입니다.');
       }
     } catch (error) {
+      toast.error('댓글 업데이트 중 오류가 발생했습니다. 다시 시도해주세요.');
       console.error('Failed to update comment:', error);
     }
   };
