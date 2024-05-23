@@ -13,6 +13,11 @@ export default {
       },
       boxShadow: {
         dd: '0 4px 10px rgba(0,0,0,0.2)',
+        calendar: '0 1px 2px rgba(0,0,0,0.05)',
+      },
+      fontFamily: {
+        pretendard: 'Pretendard Variable',
+        suit: 'SUIT Variable',
       },
     },
   },
