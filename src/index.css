@@ -33,3 +33,7 @@ input:focus {
 textarea:focus {
   outline: none !important;
 }
+
+.rhmdp-p-4 {
+  padding: 0;
+}
