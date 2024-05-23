@@ -1,3 +1,4 @@
+import React, { useEffect, useCallback } from 'react';
 import classNames from 'classnames';
 import DatePickerProvider, {
   Header,
@@ -9,53 +10,57 @@ import 'headless-react-datepicker/dist/styles.css';
 
 import PrevIcon from '@assets/icon-prev_arrow.svg';
 import NextIcon from '@assets/icon-next_arrow.svg';
-import { useEffect } from 'react';
 
-export default function DateRangePicker() {
+function DateRangePicker({ selectedDate, setSelectedDate }) {
+  const areDatesEqual = (dates1, dates2) => {
+    if (!dates1 || !dates2) return false;
+    if (dates1.length !== dates2.length) return false;
+    for (let i = 0; i < dates1.length; i++) {
+      if (dates1[i] !== dates2[i]) return false;
+    }
+    return true;
+  };
+
+  const handleQuickSelect = (days) => {
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(endDate.getDate() - days + 1);
+    const dates = [startDate, endDate];
+    if (dates && !areDatesEqual(dates, selectedDate)) {
+      setSelectedDate(dates);
+    }
+  };
+
+  const addYear = useCallback(() => {
+    document.querySelectorAll('.add-year').forEach((elem) => {
+      elem.text = `${elem.value}년`;
+    });
+  }, []);
+
   useEffect(() => {
+    addYear();
     const observer = new MutationObserver(addYear);
     const config = { childList: true, subtree: true };
-
     const targetNode = document.querySelector('.date-picker-container');
     if (targetNode) {
       observer.observe(targetNode, config);
     }
-
-    addYear();
-
     return () => {
       observer.disconnect();
     };
-  }, []);
-
-  const addYear = () => {
-    document.querySelectorAll('.add-year').forEach((elem) => {
-      elem.text = elem.value + '년';
-    });
-  };
+  }, [addYear]);
 
   const dayRenderer = (args) => {
-    const {
-      date,
-      isSelectable,
-      isDisabled,
-      isInSelectedRange,
-      isStartOfRange,
-      isEndOfRange,
-      isInWeekend,
-      isSelected,
-      handleClickSlot,
-    } = args;
+    const { date, isSelectable, isDisabled, handleClickSlot } = args;
+    let { isInSelectedRange, isStartOfRange, isEndOfRange, isSelected } = args;
 
-    function isSameDay(date1, date2) {
-      return (
-        date1.getFullYear() === date2.getFullYear() &&
-        date1.getMonth() === date2.getMonth() &&
-        date1.getDate() === date2.getDate()
-      );
+    const isToday = date.toDateString() === new Date().toDateString();
+    if (selectedDate && selectedDate.length === 2) {
+      isInSelectedRange = date >= selectedDate[0] && date <= selectedDate[1];
+      isStartOfRange = date.toDateString() === selectedDate[0].toDateString();
+      isEndOfRange = date.toDateString() === selectedDate[1].toDateString();
+      isSelected = isStartOfRange || isEndOfRange;
     }
-
-    const isToday = isSameDay(new Date(date), new Date());
 
     const dayOfWeek = new Date(date).getDay();
     const isSunday = dayOfWeek === 0;
@@ -93,12 +98,27 @@ export default function DateRangePicker() {
 
     return (
       <div
+        key={date}
         className={`flex items-center justify-center my-[3px] relative`}
-        style={{
-          background: background,
-        }}
+        style={{ background: background }}
       >
-        <div className={slotClassName} onClick={() => handleClickSlot(date)}>
+        <div
+          className={slotClassName}
+          onClick={() => {
+            let newSelectedDate;
+            if (
+              !selectedDate ||
+              selectedDate.length === 2 ||
+              date < selectedDate[0]
+            ) {
+              newSelectedDate = [date];
+            } else if (selectedDate.length === 1 && date > selectedDate[0]) {
+              newSelectedDate = [selectedDate[0], date];
+            }
+            setSelectedDate(newSelectedDate);
+            handleClickSlot(date);
+          }}
+        >
           {enUSFormattedDay}
         </div>
       </div>
@@ -106,7 +126,7 @@ export default function DateRangePicker() {
   };
 
   return (
-    <div className='w-[268px] text-sm font-suit bg-white rounded-[8px] mx-auto shadow-calendar border border-[#EEEEEE]'>
+    <div className='date-picker-container w-[268px] text-sm font-suit bg-white rounded-[8px] mx-auto shadow-calendar border border-[#EEEEEE]'>
       <div className='px-[21px] pt-[5.6px]'>
         <div>
           <DatePickerProvider
@@ -121,7 +141,6 @@ export default function DateRangePicker() {
               maxDate: Date.now(),
             }}
             isRange
-            onChange={function Ya() {}}
           >
             <div className='py-[10.4px]'>
               <Header
@@ -130,12 +149,12 @@ export default function DateRangePicker() {
                 monthSelectClassName='-order-1 font-bold text-base mr-[30px]'
                 leftIcon={
                   <div className='flex items-center justify-center w-[28.8px] h-[28.8px] rounded-[4.8px] bg-[#F9F9F9] order-[3]'>
-                    <img src={PrevIcon}></img>
+                    <img src={PrevIcon} alt='Previous'></img>
                   </div>
                 }
                 rightIcon={
                   <div className='flex items-center justify-center w-[28.8px] h-[28.8px] rounded-[4.8px] bg-[#F9F9F9] order-[4]'>
-                    <img src={NextIcon}></img>
+                    <img src={NextIcon} alt='Next'></img>
                   </div>
                 }
               />
@@ -150,10 +169,16 @@ export default function DateRangePicker() {
           빠른 선택
         </p>
         <div className='flex gap-[2px] font-pretendard'>
-          <div className='text-xs border border-[#EEEEEE] px-[8px] rounded-[12px] cursor-pointer'>
+          <div
+            onClick={() => handleQuickSelect(7)}
+            className='text-xs border border-[#EEEEEE] px-[8px] rounded-[12px] cursor-pointer'
+          >
             최근 1주일
           </div>
-          <div className='text-xs border border-[#EEEEEE] px-[8px] rounded-[12px] cursor-pointer'>
+          <div
+            onClick={() => handleQuickSelect(30)}
+            className='text-xs border border-[#EEEEEE] px-[8px] rounded-[12px] cursor-pointer'
+          >
             최근 30일
           </div>
         </div>
@@ -161,3 +186,5 @@ export default function DateRangePicker() {
     </div>
   );
 }
+
+export default React.memo(DateRangePicker);
