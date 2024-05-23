@@ -1,16 +1,19 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@store/store.js';
 
+import Modal from '@components/Modal';
 import DateRangePicker from '@components/DateRangePicker';
 import CalendarIcon from '@assets/icon-calendar.svg';
 import ChevronDownIcon from '@assets/icon-chevron_down.svg';
 
 export default function DashboardPage() {
+  const navigate = useNavigate();
   const { user } = useAuthStore();
 
   const calendarRef = useRef(null);
   const calendarButtonRef = useRef(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isShowCalendar, setIsShowCalendar] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
 
@@ -24,6 +27,24 @@ export default function DashboardPage() {
       .replace(/\.\s/g, '/')
       .replace(/\./g, '');
   };
+
+  useEffect(() => {
+    if (window.innerWidth < 640) {
+      setIsModalOpen(true);
+    }
+    const handleResize = () => {
+      if (window.innerWidth < 640) {
+        setIsModalOpen(true);
+      } else {
+        setIsModalOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -60,7 +81,7 @@ export default function DashboardPage() {
       </nav>
       <div className='flex flex-col ml-[280px] min-h-screen'>
         <div className='flex items-center justify-between h-[50px] py-[10px] px-[20px] border-b border-[#E1E1E1]'>
-          <p>기본 대시보드</p>
+          <p className='text-[#272727] font-bold text-xl'>기본 대시보드</p>
           <p>{user && `${user.nickname} 님`}</p>
         </div>
         <div className='flex flex-col flex-1 w-full h-full px-[40px] py-[20px] overflow-auto'>
@@ -96,6 +117,21 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          navigate('/');
+        }}
+        onConfirm={() => {
+          setIsModalOpen(false);
+          navigate('/');
+        }}
+        title='모바일에서 사용이 불가합니다.'
+        message={`대시보드는 모바일에서 사용이 불가하므로
+    PC 환경에서 접속해주세요. 감사합니다.`}
+        isDelete={false}
+      />
     </>
   );
 }

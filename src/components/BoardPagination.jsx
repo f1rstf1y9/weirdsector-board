@@ -12,14 +12,24 @@ export default function BoardPagination({
   const [siblingCount, setSiblingCount] = useState(4);
 
   useEffect(() => {
-    window.addEventListener('resize', () => {
+    if (window.innerWidth < 640) {
+      setSiblingCount(2);
+    } else {
+      setSiblingCount(4);
+    }
+    const handleResize = () => {
       if (window.innerWidth < 640) {
         setSiblingCount(2);
       } else {
         setSiblingCount(4);
       }
-    });
-  }, [window.innerWidth]);
+    };
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
