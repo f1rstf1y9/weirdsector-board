@@ -214,6 +214,9 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+      {isModalOpen && (
+        <div className='fixed top-0 left-0 w-full h-full bg-white z-80'></div>
+      )}
       <Modal
         isOpen={isModalOpen}
         onClose={() => {
