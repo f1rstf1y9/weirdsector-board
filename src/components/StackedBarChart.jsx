@@ -66,13 +66,13 @@ export default function StackedBarChart({ data }) {
     const margin = {
       top: 5,
       right: 10,
-      bottom: isOverflow ? 50 : 30,
+      bottom: isOverflow ? 40 : 30,
       left: 30,
     };
     const parentWidth = svgRef.current.parentElement.offsetWidth;
     const parentHeight = svgRef.current.parentElement.offsetHeight;
     const width = isOverflow
-      ? parentWidth + (data.length - 5) * 60
+      ? parentWidth + (data.length - 5) * 70
       : parentWidth - margin.left - margin.right;
     const height = parentHeight - margin.top - margin.bottom;
 
@@ -149,23 +149,47 @@ export default function StackedBarChart({ data }) {
       .attr('fill', (d) => color(d.key))
       .selectAll('path')
       .data((d, i) => {
-        return d.map((item, index) => ({
-          ...item,
-          order: i,
-        }));
+        return d.map((item, index) => {
+          const isLast =
+            item.data.etc + item.data.free + item.data.qna === item[1];
+          if (item[0] === 0 && isLast) {
+            return {
+              ...item,
+              first: true,
+              last: true,
+            };
+          } else if (item[0] === 0) {
+            return {
+              ...item,
+              first: true,
+            };
+          } else if (isLast) {
+            return {
+              ...item,
+              last: true,
+            };
+          } else {
+            return item;
+          }
+        });
       })
+
       .join('path')
       .attr('d', (d, i) => {
         const x = xScale(xDomain[i]) + xScale.bandwidth() / 2 - 11.5;
         const y = yScale(d[1]);
         const height = yScale(d[0]) - yScale(d[1]);
         const width = 23;
-        if (d.order === 0) {
-          return generatePathData(x, y, width, height, 0, 4, 4, 0);
-        } else if (d.order === 1) {
-          return generatePathData(x, y, width, height, 0, 0, 0, 0);
-        } else {
-          return generatePathData(x, y, width, height, 4, 0, 0, 4);
+        if (height) {
+          if (d.first && d.last) {
+            return generatePathData(x, y, width, height, 4, 4, 4, 4);
+          } else if (d.first) {
+            return generatePathData(x, y, width, height, 0, 4, 4, 0);
+          } else if (d.last) {
+            return generatePathData(x, y, width, height, 4, 0, 0, 4);
+          } else {
+            return generatePathData(x, y, width, height, 0, 0, 0, 0);
+          }
         }
       });
   }, [data, dimensions.width, dimensions.height]);
@@ -187,7 +211,7 @@ export default function StackedBarChart({ data }) {
     };
   }, []);
 
-  const additionalWidth = isOverflow ? (data.length - 5) * 75 : 0;
+  const additionalWidth = isOverflow ? (data.length - 5) * 70 + 30 : 0;
   return (
     <div
       className='custom-scrollbar'

@@ -6,13 +6,23 @@ export default function BarChart({ data }) {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [maxYValue, setMaxYValue] = useState(0);
 
+  const isOverflow = data.length > 5;
+
   useEffect(() => {
     const svg = d3.select(svgRef.current);
 
-    const margin = { top: 5, right: 10, bottom: 30, left: 30 };
+    const margin = {
+      top: 5,
+      right: 10,
+      bottom: isOverflow ? 40 : 30,
+      left: 30,
+    };
     const parentWidth = svgRef.current.parentElement.offsetWidth;
     const parentHeight = svgRef.current.parentElement.offsetHeight;
-    const width = parentWidth - margin.left - margin.right;
+    const width = isOverflow
+      ? parentWidth + (data.length - 5) * 70
+      : parentWidth - margin.left - margin.right;
+
     const height = parentHeight - margin.top - margin.bottom;
 
     setDimensions({ width, height });
@@ -79,7 +89,9 @@ export default function BarChart({ data }) {
       .attr('class', 'bar')
       .attr('fill', '#F58A91')
       .attr('x', (d) => xScale(d.label) + xScale.bandwidth() / 2 - 11.5)
-      .attr('y', (d) => yScale(d.value))
+      .attr('y', (d) => {
+        return yScale(d.value);
+      })
       .attr('width', 23)
       .attr('height', (d) => height - yScale(d.value))
       .attr('rx', 4)
@@ -88,7 +100,9 @@ export default function BarChart({ data }) {
 
   useEffect(() => {
     const maxY = d3.max(data, (d) => d.value);
-    setMaxYValue(maxY);
+    if (maxY !== undefined) {
+      setMaxYValue(maxY);
+    }
   }, [data]);
 
   useEffect(() => {
@@ -108,11 +122,23 @@ export default function BarChart({ data }) {
     };
   }, []);
 
+  const additionalWidth = isOverflow ? (data.length - 5) * 70 + 30 : 0;
   return (
-    <svg ref={svgRef} style={{ width: '100%', height: '100%' }}>
-      <g className='x-axis' />
-      <g className='y-axis' />
-      <g className='bars' />
-    </svg>
+    <div
+      className='custom-scrollbar'
+      style={{ width: '100%', height: '100%', overflowY: 'auto' }}
+    >
+      <svg
+        ref={svgRef}
+        style={{
+          width: `calc(100% + ${additionalWidth}px)`,
+          height: '100%',
+        }}
+      >
+        <g className='x-axis' />
+        <g className='y-axis' />
+        <g className='bars' />
+      </svg>
+    </div>
   );
 }

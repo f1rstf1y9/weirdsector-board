@@ -15,13 +15,13 @@ export default function LineChart({ data }) {
     const margin = {
       top: 5,
       right: 10,
-      bottom: isOverflow ? 50 : 30,
+      bottom: isOverflow ? 40 : 30,
       left: 30,
     };
     const parentWidth = svgRef.current.parentElement.offsetWidth;
     const parentHeight = svgRef.current.parentElement.offsetHeight;
     const width = isOverflow
-      ? parentWidth + (data.length - 5) * 60
+      ? parentWidth + (data.length - 5) * 70
       : parentWidth - margin.left - margin.right;
     const height = parentHeight - margin.top - margin.bottom;
     setDimensions({ width, height });
@@ -131,7 +131,7 @@ export default function LineChart({ data }) {
     };
   }, []);
 
-  const additionalWidth = isOverflow ? (data.length - 5) * 75 : 0;
+  const additionalWidth = isOverflow ? (data.length - 5) * 70 + 30 : 0;
   return (
     <div
       className='custom-scrollbar'
