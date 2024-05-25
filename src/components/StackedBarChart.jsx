@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
+import '@assets/styles.css';
 
 export default function StackedBarChart({ data }) {
   const svgRef = useRef();
@@ -186,9 +187,12 @@ export default function StackedBarChart({ data }) {
     };
   }, []);
 
-  const additionalWidth = isOverflow ? (data.length - 5) * 60 : 0;
+  const additionalWidth = isOverflow ? (data.length - 5) * 75 : 0;
   return (
-    <div style={{ width: '100%', height: '100%', overflowX: 'auto' }}>
+    <div
+      className='custom-scrollbar'
+      style={{ width: '100%', height: '100%', overflowY: 'auto' }}
+    >
       <svg
         ref={svgRef}
         style={{
