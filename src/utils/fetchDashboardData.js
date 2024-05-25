@@ -111,50 +111,56 @@ export async function fetchHashtagsForPosts(postIds) {
       throw new Error(error.message);
     }
 
-    return data.map((item) => item.hashtag_id) || [];
+    return countHashtags(data);
   } catch (error) {
     console.error('Error fetching hashtags:', error.message);
     return [];
   }
+}
+
+// 해시태그 id별 사용 횟수를 계산하는 함수
+export function countHashtags(hashtagIds) {
+  const hashtagCounts = {};
+
+  hashtagIds.forEach((hashtag) => {
+    if (hashtagCounts[hashtag.hashtag_id]) {
+      hashtagCounts[hashtag.hashtag_id]++;
+    } else {
+      hashtagCounts[hashtag.hashtag_id] = 1;
+    }
+  });
+
+  const results = Object.entries(hashtagCounts).map(([hashtag_id, count]) => ({
+    hashtag_id: parseInt(hashtag_id),
+    value: count,
+  }));
+
+  return results;
 }
 
 // 해시태그 id를 기반으로 실제 해시태그 가져오기
 export async function fetchHashtags(hashtagIds) {
   try {
-    const { data, error } = await supabase
-      .from('hashtags')
-      .select('hashtag')
-      .in('hashtag_id', hashtagIds);
+    const hashtagPromises = hashtagIds.map(async (item) => {
+      const { data, error } = await supabase
+        .from('hashtags')
+        .select('hashtag')
+        .eq('hashtag_id', item.hashtag_id);
 
-    if (error) {
-      throw new Error(error.message);
-    }
+      if (error) {
+        throw new Error(error.message);
+      }
 
-    return data.map((item) => item.hashtag) || [];
+      return {
+        label: `#${data[0].hashtag}`,
+        value: item.value,
+      };
+    });
+
+    const hashtagsData = await Promise.all(hashtagPromises);
+    return hashtagsData;
   } catch (error) {
     console.error('Error fetching hashtags:', error.message);
     return [];
   }
-}
-
-// 해시태그별 사용 횟수를 계산하는 함수
-export function countHashtags(hashtags) {
-  const hashtagCounts = {};
-
-  hashtags.forEach((hashtag) => {
-    if (hashtagCounts[hashtag]) {
-      hashtagCounts[hashtag] += 1;
-    } else {
-      hashtagCounts[hashtag] = 1;
-    }
-  });
-
-  const formattedResults = Object.entries(hashtagCounts).map(
-    ([label, value]) => ({
-      label: `#${label}`,
-      value: value,
-    })
-  );
-
-  return formattedResults;
 }
