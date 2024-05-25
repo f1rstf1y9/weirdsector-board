@@ -3,8 +3,10 @@ import { useParams, useNavigate } from 'react-router-dom';
 import useBoardValidation from '@hook/useBoardValidation';
 import { useAuthStore } from '@store/store.js';
 import { supabase } from '../../supabase';
+import toast from 'react-hot-toast';
 
 import Button from '@components/Button.jsx';
+import CloseIcon from '@assets/icon-close.svg';
 
 function UpdatePostPage() {
   const navigate = useNavigate();
@@ -71,6 +73,9 @@ function UpdatePostPage() {
         const resolvedHashtags = await Promise.all(hashtagPromises);
         setHashtag(resolvedHashtags.join(' '));
       } catch (error) {
+        toast.error(
+          '게시글 정보를 불러오는 중 오류가 발생했습니다. 다시 시도해주세요.'
+        );
         console.error('Failed to fetch post data:', error);
       }
     };
@@ -162,9 +167,12 @@ function UpdatePostPage() {
             throw relationError;
           }
         }
-
+        toast.success('게시글을 성공적으로 업데이트 했습니다.');
         navigate(`/${board}/${postId}`);
       } else {
+        toast.error(
+          '게시글 업데이트 중 오류가 발생했습니다. 다시 시도해주세요.'
+        );
         console.error('인증되지 않은 사용자입니다.');
       }
     } catch (error) {
@@ -227,35 +235,7 @@ function UpdatePostPage() {
                     setFile(null);
                   }}
                 >
-                  {file && (
-                    <svg
-                      width='24px'
-                      height='24px'
-                      viewBox='0 0 24 24'
-                      fill='none'
-                      xmlns='http://www.w3.org/2000/svg'
-                      style={{ pointerEvents: 'none' }}
-                    >
-                      <g id='SVGRepo_bgCarrier' stroke-width='0'></g>
-                      <g
-                        id='SVGRepo_tracerCarrier'
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                      ></g>
-                      <g id='SVGRepo_iconCarrier'>
-                        <g id='Menu / Close_MD'>
-                          <path
-                            id='Vector'
-                            d='M18 18L12 12M12 12L6 6M12 12L18 6M12 12L6 18'
-                            stroke='#000000'
-                            strokeWidth='2'
-                            strokeLinecap='round'
-                            strokeLinejoin='round'
-                          ></path>
-                        </g>
-                      </g>
-                    </svg>
-                  )}
+                  {file && <img src={CloseIcon} alt='파일 첨부 취소' />}
                 </div>
               </label>
               <input

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import useBoardValidation from '@hook/useBoardValidation';
+import toast from 'react-hot-toast';
 import { useAuthStore } from '@store/store.js';
 import { supabase } from '../supabase';
 import { formatDistanceToNow, parseISO } from 'date-fns';
@@ -30,6 +31,7 @@ function BoardPage() {
         .select('count', { count: 'exact' })
         .eq('board', board);
       if (error) {
+        toast.error('게시판 로딩 중에 오류가 발생했습니다.');
         console.error('Error fetching total posts count:', error.message);
       } else {
         const totalPostsCount = count ?? 0;
@@ -54,6 +56,7 @@ function BoardPage() {
         );
 
       if (error) {
+        toast.error('게시판 로딩 중에 오류가 발생했습니다.');
         console.error('Error fetching posts:', error.message);
       } else {
         setDisplayedPosts(posts);
@@ -139,8 +142,24 @@ function BoardPage() {
               </div>
             </>
           ) : (
-            <div className='flex items-center justify-center w-full h-[200px]'>
-              게시글이 없어요 :(
+            <div className='flex flex-col items-center justify-center w-full'>
+              <div className='flex items-center justify-center w-full h-[300px]'>
+                게시글이 없어요 :(
+              </div>
+
+              <div className='w-full flex items-start justify-center relative h-[106px] lg:h-[48px]'>
+                <div className='absolute bottom-0 lg:top-0 right-0'>
+                  {user && (
+                    <Button
+                      width='w-[127px]'
+                      height='h-[48px]'
+                      onClick={() => navigate('create-post')}
+                    >
+                      글쓰기
+                    </Button>
+                  )}
+                </div>
+              </div>
             </div>
           )}
         </div>

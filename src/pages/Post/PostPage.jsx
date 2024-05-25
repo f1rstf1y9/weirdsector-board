@@ -6,9 +6,12 @@ import { supabase } from '../../supabase';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { ko } from 'date-fns/locale';
 
+import Comment from './Comment.jsx';
 import Dropdown from '@components/Dropdown.jsx';
 import Button from '@components/Button.jsx';
 import Modal from '@components/Modal';
+import KebabIcon from '@assets/icon-kebab.svg';
+import PrevIcon from '@assets/icon-prev.svg';
 
 function PostPage() {
   const navigate = useNavigate();
@@ -21,7 +24,6 @@ function PostPage() {
   const [comment, setComment] = useState('');
   const [comments, setComments] = useState([]);
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
-  const [commentModalId, setcommentModalId] = useState(null);
 
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
@@ -173,32 +175,6 @@ function PostPage() {
     }
   };
 
-  const handleCommentDelete = async () => {
-    try {
-      if (user && commentModalId) {
-        const comment = comments.find(
-          (comment) => comment.comment_id === commentModalId
-        );
-        if (comment && user.id === comment.user_id) {
-          const { error } = await supabase
-            .from('comments')
-            .delete()
-            .eq('comment_id', commentModalId);
-          if (error) {
-            throw error;
-          }
-          fetchCommentsData();
-        } else {
-          console.error('You are not authorized to delete this comment.');
-        }
-      }
-    } catch (error) {
-      console.error('Failed to delete comment:', error);
-    } finally {
-      setcommentModalId(null);
-    }
-  };
-
   return (
     <>
       <div className='w-full flex justify-center sm:text-[20px]'>
@@ -207,21 +183,7 @@ function PostPage() {
             <div className='flex justify-between items-center'>
               <div className='flex gap-[16px] items-center'>
                 <Link to={`/${board}`}>
-                  <svg
-                    width='9'
-                    height='14'
-                    viewBox='0 0 9 14'
-                    fill='none'
-                    xmlns='http://www.w3.org/2000/svg'
-                  >
-                    <path
-                      d='M7.49984 1.16663L1.6665 6.99996L7.49984 12.8333'
-                      stroke='black'
-                      strokeWidth='2'
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
-                    />
-                  </svg>
+                  <img src={PrevIcon} alt='이전' />
                 </Link>
 
                 <h1 className='font-bold text-[26px] sm:text-[32px]'>
@@ -247,18 +209,7 @@ function PostPage() {
                       },
                     ]}
                   >
-                    <svg
-                      width='4'
-                      className='h-[18px] sm:h-[24px]'
-                      viewBox='0 0 4 26'
-                      fill='none'
-                      xmlns='http://www.w3.org/2000/svg'
-                    >
-                      <path
-                        d='M0 2.96863C0 3.49906 0.210713 4.00777 0.585786 4.38284C0.960859 4.75791 1.46957 4.96863 2 4.96863C2.53043 4.96863 3.03914 4.75791 3.41421 4.38284C3.78929 4.00777 4 3.49906 4 2.96863C4 2.4382 3.78929 1.92949 3.41421 1.55441C3.03914 1.17934 2.53043 0.968628 2 0.968628C1.46957 0.968628 0.960859 1.17934 0.585786 1.55441C0.210713 1.92949 0 2.4382 0 2.96863ZM0 12.9686C0 13.4991 0.210713 14.0078 0.585786 14.3828C0.960859 14.7579 1.46957 14.9686 2 14.9686C2.53043 14.9686 3.03914 14.7579 3.41421 14.3828C3.78929 14.0078 4 13.4991 4 12.9686C4 12.4382 3.78929 11.9295 3.41421 11.5544C3.03914 11.1793 2.53043 10.9686 2 10.9686C1.46957 10.9686 0.960859 11.1793 0.585786 11.5544C0.210713 11.9295 0 12.4382 0 12.9686V12.9686ZM0 22.9686C0 23.4991 0.210713 24.0078 0.585786 24.3828C0.960859 24.7579 1.46957 24.9686 2 24.9686C2.53043 24.9686 3.03914 24.7579 3.41421 24.3828C3.78929 24.0078 4 23.4991 4 22.9686C4 22.4382 3.78929 21.9295 3.41421 21.5544C3.03914 21.1793 2.53043 20.9686 2 20.9686C1.46957 20.9686 0.960859 21.1793 0.585786 21.5544C0.210713 21.9295 0 22.4382 0 22.9686V22.9686Z'
-                        fill='black'
-                      />
-                    </svg>
+                    <img src={KebabIcon} alt='게시글 메뉴 보기' />
                   </Dropdown>
                 )}
               </div>
@@ -320,53 +271,13 @@ function PostPage() {
           )}
 
           {comments.map((comment) => (
-            <React.Fragment key={comment.comment_id}>
-              <hr />
-              <div className='flex flex-col gap-[16px]'>
-                <div className='flex items-center justify-between'>
-                  <p className='text-lg sm:text-xl font-bold'>
-                    {comment.user_nickname}
-                  </p>
-                  <div>
-                    {comment.user_id === user?.id && (
-                      <Dropdown
-                        anchor='bottom end'
-                        items={[
-                          {
-                            content: '수정',
-                            onClick: () => {},
-                          },
-                          {
-                            content: '삭제',
-                            onClick: () => {
-                              setcommentModalId(comment.comment_id);
-                            },
-                          },
-                        ]}
-                      >
-                        <svg
-                          width='4'
-                          className='h-[18px] sm:h-[24px]'
-                          viewBox='0 0 4 26'
-                          fill='none'
-                          xmlns='http://www.w3.org/2000/svg'
-                        >
-                          <path
-                            d='M0 2.96863C0 3.49906 0.210713 4.00777 0.585786 4.38284C0.960859 4.75791 1.46957 4.96863 2 4.96863C2.53043 4.96863 3.03914 4.75791 3.41421 4.38284C3.78929 4.00777 4 3.49906 4 2.96863C4 2.4382 3.78929 1.92949 3.41421 1.55441C3.03914 1.17934 2.53043 0.968628 2 0.968628C1.46957 0.968628 0.960859 1.17934 0.585786 1.55441C0.210713 1.92949 0 2.4382 0 2.96863ZM0 12.9686C0 13.4991 0.210713 14.0078 0.585786 14.3828C0.960859 14.7579 1.46957 14.9686 2 14.9686C2.53043 14.9686 3.03914 14.7579 3.41421 14.3828C3.78929 14.0078 4 13.4991 4 12.9686C4 12.4382 3.78929 11.9295 3.41421 11.5544C3.03914 11.1793 2.53043 10.9686 2 10.9686C1.46957 10.9686 0.960859 11.1793 0.585786 11.5544C0.210713 11.9295 0 12.4382 0 12.9686V12.9686ZM0 22.9686C0 23.4991 0.210713 24.0078 0.585786 24.3828C0.960859 24.7579 1.46957 24.9686 2 24.9686C2.53043 24.9686 3.03914 24.7579 3.41421 24.3828C3.78929 24.0078 4 23.4991 4 22.9686C4 22.4382 3.78929 21.9295 3.41421 21.5544C3.03914 21.1793 2.53043 20.9686 2 20.9686C1.46957 20.9686 0.960859 21.1793 0.585786 21.5544C0.210713 21.9295 0 22.4382 0 22.9686V22.9686Z'
-                            fill='black'
-                          />
-                        </svg>
-                      </Dropdown>
-                    )}
-                  </div>
-                </div>
-
-                <p>{comment.content}</p>
-                <p className='text-sm sm:text-base text-[#B8B7B7]'>
-                  {formatTimestamp(comment.created_at)}
-                </p>
-              </div>
-            </React.Fragment>
+            <Comment
+              key={comment.comment_id}
+              comment={comment}
+              user={user}
+              setComments={setComments}
+              formatTimestamp={formatTimestamp}
+            ></Comment>
           ))}
         </div>
       </div>
@@ -377,15 +288,6 @@ function PostPage() {
         onConfirm={handlePostDelete}
         title='게시글 삭제'
         message='해당 게시글을 삭제하시겠습니까?'
-        isDelete={true}
-      />
-
-      <Modal
-        isOpen={commentModalId}
-        onClose={() => setcommentModalId(null)}
-        onConfirm={handleCommentDelete}
-        title='댓글 삭제'
-        message='해당 댓글을 삭제하시겠습니까?'
         isDelete={true}
       />
     </>

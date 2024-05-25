@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Pagination } from 'react-headless-pagination';
 
+import PrevIcon from '@assets/icon-prev.svg';
+import NextIcon from '@assets/icon-next.svg';
+
 export default function BoardPagination({
   totalPages,
   currentPage,
@@ -9,14 +12,24 @@ export default function BoardPagination({
   const [siblingCount, setSiblingCount] = useState(4);
 
   useEffect(() => {
-    window.addEventListener('resize', () => {
+    if (window.innerWidth < 640) {
+      setSiblingCount(2);
+    } else {
+      setSiblingCount(4);
+    }
+    const handleResize = () => {
       if (window.innerWidth < 640) {
         setSiblingCount(2);
       } else {
         setSiblingCount(4);
       }
-    });
-  }, [window.innerWidth]);
+    };
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -35,21 +48,7 @@ export default function BoardPagination({
         truncableClassName=''
       >
         <Pagination.PrevButton className='cursor-pointer'>
-          <svg
-            width='20'
-            height='21'
-            viewBox='0 0 20 21'
-            fill='none'
-            xmlns='http://www.w3.org/2000/svg'
-          >
-            <path
-              d='M12.5003 4.66675L6.66699 10.5001L12.5003 16.3334'
-              stroke='black'
-              strokeWidth='2'
-              strokeLinecap='round'
-              strokeLinejoin='round'
-            />
-          </svg>
+          <img src={PrevIcon} alt='이전' />
         </Pagination.PrevButton>
 
         <nav className='flex justify-center text-sm px-[24px]'>
@@ -63,21 +62,7 @@ export default function BoardPagination({
         </nav>
 
         <Pagination.NextButton className='cursor-pointer'>
-          <svg
-            width='20'
-            height='21'
-            viewBox='0 0 20 21'
-            fill='none'
-            xmlns='http://www.w3.org/2000/svg'
-          >
-            <path
-              d='M6.66667 16.3333L12.5 10.4999L6.66667 4.66659'
-              stroke='black'
-              strokeWidth='2'
-              strokeLinecap='round'
-              strokeLinejoin='round'
-            />
-          </svg>
+          <img src={NextIcon} alt='다음' />
         </Pagination.NextButton>
       </Pagination>
     </>
