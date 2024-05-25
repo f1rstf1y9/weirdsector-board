@@ -3,13 +3,14 @@ import { supabase } from '../supabase';
 // 두 날짜 사이의 포스트를 가져오는 함수
 export async function fetchPostsBetweenDates(startDate, endDate) {
   try {
-    const isoStartDate = startDate.toISOString();
-    const isoEndDate = endDate.toISOString();
+    const nextDay = new Date(endDate);
+    nextDay.setDate(nextDay.getDate() + 1);
+    const isoEndDate = nextDay.toISOString();
 
     const { data, error } = await supabase
       .from('posts')
       .select('*')
-      .gte('created_at', isoStartDate)
+      .gte('created_at', startDate.toISOString())
       .lte('created_at', isoEndDate);
 
     if (error) {
@@ -51,7 +52,6 @@ export function countPostsByDate(posts, startDate, endDate) {
 // 날짜별로 각 board에 적힌 게시글의 수를 계산하는 함수
 export function countPostsByDateAndBoard(posts, startDate, endDate) {
   const postCountByDateAndBoard = {};
-
   const dateRange = getDateRange(startDate, endDate);
   dateRange.forEach((date) => {
     postCountByDateAndBoard[date] = { free: 0, qna: 0, etc: 0 };
@@ -82,6 +82,9 @@ export function countPostsByDateAndBoard(posts, startDate, endDate) {
 // startDate와 endDate 사이의 모든 날짜를 반환하는 함수
 function getDateRange(startDate, endDate) {
   const dateRange = [];
+  startDate = new Date(startDate).setDate(startDate.getDate() + 1);
+  endDate = new Date(endDate).setDate(endDate.getDate() + 1);
+
   let currentDate = new Date(startDate);
   while (currentDate <= endDate) {
     dateRange.push(currentDate.toISOString().slice(0, 10));
