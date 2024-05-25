@@ -1,7 +1,18 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@store/store.js';
+import toast from 'react-hot-toast';
+import {
+  fetchPostsBetweenDates,
+  fetchHashtagsForPosts,
+  fetchHashtags,
+  countPostsByDate,
+  countPostsByDateAndBoard,
+} from '../utils/fetchDashboardData.js';
 
+import LineChart from '../components/LineChart';
+import BarChart from '@components/BarChart';
+import StackedBarChart from '@components/StackedBarChart';
 import Modal from '@components/Modal';
 import DateRangePicker from '@components/DateRangePicker';
 import CalendarIcon from '@assets/icon-calendar.svg';
@@ -16,6 +27,11 @@ export default function DashboardPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isShowCalendar, setIsShowCalendar] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
+
+  const [postCountsByDate, setPostCountsByDate] = useState(null);
+  const [postCountsByDateAndBoard, setPostCountsByDateAndBoard] =
+    useState(null);
+  const [hashtagCounts, setHashtagCounts] = useState(null);
 
   const formattedDate = (date) => {
     return new Date(date)
@@ -62,6 +78,46 @@ export default function DashboardPage() {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (selectedDate && selectedDate.length === 2) {
+        try {
+          const posts = await fetchPostsBetweenDates(
+            selectedDate[0],
+            selectedDate[1]
+          );
+
+          const postCountsByDateRes = countPostsByDate(
+            posts,
+            selectedDate[0],
+            selectedDate[1]
+          );
+          setPostCountsByDate(postCountsByDateRes);
+
+          const postIds = posts.map((post) => post.post_id);
+          const hashtagIds = await fetchHashtagsForPosts(postIds);
+          const hashtags = await fetchHashtags(hashtagIds);
+
+          setHashtagCounts(hashtags);
+
+          const postCountsByDateAndBoardRes = countPostsByDateAndBoard(
+            posts,
+            selectedDate[0],
+            selectedDate[1]
+          );
+          setPostCountsByDateAndBoard(postCountsByDateAndBoardRes);
+        } catch (error) {
+          toast.error(
+            '데이터를 불러오는 중에 오류가 발생했습니다. 다시 시도해주세요.'
+          );
+          console.error('Error fetching posts:', error.message);
+        }
+      }
+    };
+
+    fetchData();
+  }, [selectedDate]);
 
   return (
     <>
@@ -111,12 +167,56 @@ export default function DashboardPage() {
             )}
           </div>
           <div className='lg:flex-1 grid gap-[20px] lg:grid-cols-2 items-stretch h-full'>
-            <div className='rounded border border-[#E1E1E1] min-h-[438px] lg:min-h-0'></div>
-            <div className='rounded border border-[#E1E1E1] min-h-[438px] lg:min-h-0'></div>
-            <div className='rounded border border-[#E1E1E1] min-h-[438px] lg:min-h-0'></div>
+            {postCountsByDate && postCountsByDateAndBoard && hashtagCounts && (
+              <>
+                <div className='rounded border border-[#E1E1E1] min-h-[438px] lg:min-h-0 px-[28px] py-[20px] flex flex-col gap-[20px]'>
+                  <p className='font-bold'>날짜별 게시글 등록 수</p>
+                  <div className='w-full flex justify-end items-center gap-[12px]'>
+                    <div className='bg-[#F58A91] w-[16px] h-[16px] rounded-full'></div>
+                    <p className='text-xs font-medium'>게시글 등록수</p>
+                  </div>
+                  <div className='w-full flex-1'>
+                    <LineChart data={postCountsByDate} />
+                  </div>
+                </div>
+                <div className='rounded border border-[#E1E1E1] min-h-[438px] lg:min-h-0 px-[28px] py-[20px] flex flex-col gap-[20px]'>
+                  <p className='font-bold'>해시태그별 게시글 등록 수</p>
+                  <div className='w-full flex justify-end items-center gap-[12px]'>
+                    <div className='bg-[#F58A91] w-[16px] h-[16px] rounded-full'></div>
+                    <p className='text-xs font-medium'>게시글 등록수</p>
+                  </div>
+                  <div className='w-full flex-1'>
+                    <BarChart data={hashtagCounts} />
+                  </div>
+                </div>
+                <div className='rounded border border-[#E1E1E1] min-h-[438px] lg:min-h-0 px-[28px] py-[20px] flex flex-col gap-[20px]'>
+                  <p className='font-bold'>게시판별 게시글 등록 수</p>
+                  <div className='w-full flex justify-end items-center gap-[20px]'>
+                    <div className='flex justify-end items-center gap-[12px]'>
+                      <div className='bg-[#F58A91] w-[16px] h-[16px] rounded-full'></div>
+                      <p className='text-xs font-medium'>자유게시판</p>
+                    </div>
+                    <div className='flex justify-end items-center gap-[12px]'>
+                      <div className='bg-[#8AB2FF] w-[16px] h-[16px] rounded-full'></div>
+                      <p className='text-xs font-medium'>질문게시판</p>
+                    </div>
+                    <div className='flex justify-end items-center gap-[12px]'>
+                      <div className='bg-[#BFF2CB] w-[16px] h-[16px] rounded-full'></div>
+                      <p className='text-xs font-medium'>기타게시판</p>
+                    </div>
+                  </div>
+                  <div className='w-full flex-1'>
+                    <StackedBarChart data={postCountsByDateAndBoard} />
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
+      {isModalOpen && (
+        <div className='fixed top-0 left-0 w-full h-full bg-white z-80'></div>
+      )}
       <Modal
         isOpen={isModalOpen}
         onClose={() => {
