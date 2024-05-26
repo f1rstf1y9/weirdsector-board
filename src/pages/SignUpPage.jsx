@@ -40,21 +40,9 @@ export default function SignUpPage() {
   const signUpHandler = async (e) => {
     e.preventDefault();
 
-    const validatePassword = () => {
-      if (password.length < 8) {
-        return false;
-      }
-      const regexes = [/[A-Za-z]/g, /[0-9]/g, /[^A-Za-z0-9]/g];
-      let matchCount = 0;
-      for (let regex of regexes) {
-        if (password.match(regex)) {
-          matchCount++;
-        }
-      }
-      if (matchCount < 2) {
-        return false;
-      }
-      return true;
+    const validatePassword = (password) => {
+      const regex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+      return regex.test(password);
     };
 
     const validateForm = () => {
