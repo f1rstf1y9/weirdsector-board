@@ -17,7 +17,7 @@ export default function SignUpPage() {
   const [password, setPassword] = useState('');
   const [passwordCheck, setPasswordCheck] = useState('');
   const [nickname, setNickname] = useState('');
-  const [isChecked, setIsChecked] = useState('');
+  const [isChecked, setIsChecked] = useState(false);
 
   const [emailErr, setEmailErr] = useState('');
   const [pwdErr, setPwdErr] = useState('');
