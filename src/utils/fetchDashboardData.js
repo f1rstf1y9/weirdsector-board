@@ -1,17 +1,17 @@
 import { supabase } from '../supabase';
+import { startOfDay, endOfDay, formatISO } from 'date-fns';
 
 // 두 날짜 사이의 포스트를 가져오는 함수
 export async function fetchPostsBetweenDates(startDate, endDate) {
   try {
-    const nextDay = new Date(endDate);
-    nextDay.setDate(nextDay.getDate() + 1);
-    const isoEndDate = nextDay.toISOString();
+    const utcStartDate = formatISO(startOfDay(startDate), { timeZone: 'UTC' });
+    const utcEndDate = formatISO(endOfDay(endDate), { timeZone: 'UTC' });
 
     const { data, error } = await supabase
       .from('posts')
       .select('*')
-      .gte('created_at', startDate.toISOString())
-      .lte('created_at', isoEndDate);
+      .gt('created_at', utcStartDate)
+      .lte('created_at', utcEndDate);
 
     if (error) {
       throw new Error(error.message);
@@ -35,7 +35,9 @@ export function countPostsByDate(posts, startDate, endDate) {
   });
 
   posts.forEach((post) => {
-    const date = new Date(post.created_at).toISOString().slice(0, 10);
+    const utcDate = new Date(post.created_at);
+    utcDate.setHours(utcDate.getHours() + 9);
+    const date = utcDate.toISOString().slice(0, 10);
     postCountByDate[date] = (postCountByDate[date] || 0) + 1;
   });
 
@@ -58,7 +60,9 @@ export function countPostsByDateAndBoard(posts, startDate, endDate) {
   });
 
   posts.forEach((post) => {
-    const date = new Date(post.created_at).toISOString().slice(0, 10);
+    const utcDate = new Date(post.created_at);
+    utcDate.setHours(utcDate.getHours() + 9);
+    const date = utcDate.toISOString().slice(0, 10);
     const board = post.board;
     if (!postCountByDateAndBoard[date][board]) {
       postCountByDateAndBoard[date][board] = 0;
