@@ -23,7 +23,9 @@ function DateRangePicker({ selectedDate, setSelectedDate }) {
 
   const handleQuickSelect = (days) => {
     const endDate = new Date();
+    endDate.setHours(0, 0, 0, 0);
     const startDate = new Date();
+    startDate.setHours(0, 0, 0, 0);
     startDate.setDate(endDate.getDate() - days + 1);
     const dates = [startDate, endDate];
     if (dates && !areDatesEqual(dates, selectedDate)) {
