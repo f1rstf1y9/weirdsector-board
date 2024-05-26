@@ -223,7 +223,7 @@ function PostPage() {
             </div>
           </div>
 
-          <div>{postObj?.content}</div>
+          <div className='whitespace-pre-wrap'>{postObj?.content}</div>
 
           {postObj?.attachment_name && (
             <div className='flex gap-[20px]'>

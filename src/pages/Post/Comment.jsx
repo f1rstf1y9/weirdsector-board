@@ -133,7 +133,7 @@ export default function Comment({
           </form>
         ) : (
           <>
-            <p>{comment.content}</p>
+            <p className='whitespace-pre-wrap'>{comment.content}</p>
             <p className='text-sm sm:text-base text-[#B8B7B7]'>
               {formatTimestamp(comment.created_at)}
             </p>
