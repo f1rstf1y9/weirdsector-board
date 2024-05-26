@@ -12,6 +12,7 @@ import Button from '@components/Button.jsx';
 import Modal from '@components/Modal';
 import KebabIcon from '@assets/icon-kebab.svg';
 import PrevIcon from '@assets/icon-prev.svg';
+import LoadingSpinner from '@assets/loading-spinner.gif';
 
 function PostPage() {
   const navigate = useNavigate();
@@ -178,108 +179,121 @@ function PostPage() {
   return (
     <>
       <div className='w-full flex justify-center sm:text-[20px]'>
-        <div className='w-full sm:w-[1144px] flex flex-col gap-[40px] my-[80px] sm:my-[100px]'>
-          <div className='flex flex-col gap-[20px]'>
-            <div className='flex justify-between items-center'>
-              <div className='flex gap-[16px] items-center'>
-                <Link to={`/${board}`}>
-                  <img src={PrevIcon} alt='이전' />
+        {postObj ? (
+          <div className='w-full sm:w-[1144px] flex flex-col gap-[40px] my-[80px] sm:my-[100px]'>
+            <div className='flex flex-col gap-[20px]'>
+              <div className='flex justify-between items-center'>
+                <div className='flex gap-[16px] items-center'>
+                  <Link to={`/${board}`}>
+                    <img src={PrevIcon} alt='이전' />
+                  </Link>
+
+                  <h1 className='font-bold text-[26px] sm:text-[32px]'>
+                    {postObj?.title}
+                  </h1>
+                </div>
+                <div>
+                  {user?.id === postObj?.user_id && (
+                    <Dropdown
+                      anchor='bottom end'
+                      items={[
+                        {
+                          content: '수정',
+                          onClick: () => {
+                            navigate('update');
+                          },
+                        },
+                        {
+                          content: '삭제',
+                          onClick: () => {
+                            setIsPostModalOpen(true);
+                          },
+                        },
+                      ]}
+                    >
+                      <img src={KebabIcon} alt='게시글 메뉴 보기' />
+                    </Dropdown>
+                  )}
+                </div>
+              </div>
+              <div className='flex items-center gap-[10px] text-sm sm:text-base'>
+                <p>{postObj?.user_nickname}</p>
+                <div className='w-1 h-[18px] border-r border-r-[#E1E1E1]'></div>
+                <p>{postObj && formatTimestamp(postObj?.created_at)}</p>
+                <div className='w-1 h-[18px] border-r border-r-[#E1E1E1]'></div>
+                <p>조회수 {postObj?.view_counts}</p>
+              </div>
+            </div>
+
+            <div>{postObj?.content}</div>
+
+            {postObj?.attachment_name && (
+              <div className='flex gap-[20px]'>
+                <p className='text-red'>첨부된 파일</p>
+                <Link
+                  href={attachmentUrl}
+                  className='font-bold'
+                  download={postObj?.attachment_name}
+                >
+                  {postObj?.attachment_name}
                 </Link>
+              </div>
+            )}
 
-                <h1 className='font-bold text-[26px] sm:text-[32px]'>
-                  {postObj?.title}
-                </h1>
+            {hashtags && (
+              <div className='flex gap-[8px] text-sm sm:text-base'>
+                {hashtags.map((hashtag, idx) => {
+                  return (
+                    <div
+                      key={idx}
+                      className='h-[32px] px-[20px] bg-[#EEEEEE] flex items-center justify-center rounded-full'
+                    >
+                      #{hashtag}
+                    </div>
+                  );
+                })}
               </div>
-              <div>
-                {user?.id === postObj?.user_id && (
-                  <Dropdown
-                    anchor='bottom end'
-                    items={[
-                      {
-                        content: '수정',
-                        onClick: () => {
-                          navigate('update');
-                        },
-                      },
-                      {
-                        content: '삭제',
-                        onClick: () => {
-                          setIsPostModalOpen(true);
-                        },
-                      },
-                    ]}
-                  >
-                    <img src={KebabIcon} alt='게시글 메뉴 보기' />
-                  </Dropdown>
-                )}
+            )}
+
+            {user && (
+              <form className='w-100 flex gap-[20px] '>
+                <input
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  required
+                  className='min-w-0 h-[55px] flex-1 shrink bg-white rounded border border-[#E1E1E1] focus:border-black focus:!border-black px-5 py-3.5 flex gap-4'
+                ></input>
+                <Button
+                  width='shrink-0 w-[88px] sm:w-[142px]'
+                  onClick={handleCommentSubmit}
+                >
+                  댓글 작성
+                </Button>
+              </form>
+            )}
+
+            {comments.length ? (
+              comments.map((comment) => (
+                <Comment
+                  key={comment.comment_id}
+                  comment={comment}
+                  user={user}
+                  setComments={setComments}
+                  formatTimestamp={formatTimestamp}
+                ></Comment>
+              ))
+            ) : (
+              <div className='w-full h-[150px] flex flex-col gap-[10px] items-center justify-center text-[#cccccc] text-base'>
+                <p>댓글이 없어요 :(</p>
+                <p>새로운 댓글을 작성해주세요!</p>
               </div>
-            </div>
-            <div className='flex items-center gap-[10px] text-sm sm:text-base'>
-              <p>{postObj?.user_nickname}</p>
-              <div className='w-1 h-[18px] border-r border-r-[#E1E1E1]'></div>
-              <p>{postObj && formatTimestamp(postObj?.created_at)}</p>
-              <div className='w-1 h-[18px] border-r border-r-[#E1E1E1]'></div>
-              <p>조회수 {postObj?.view_counts}</p>
-            </div>
+            )}
           </div>
-
-          <div>{postObj?.content}</div>
-
-          {postObj?.attachment_name && (
-            <div className='flex gap-[20px]'>
-              <p className='text-red'>첨부된 파일</p>
-              <a
-                href={attachmentUrl}
-                className='font-bold'
-                download={postObj?.attachment_name}
-              >
-                {postObj?.attachment_name}
-              </a>
-            </div>
-          )}
-
-          {hashtags && (
-            <div className='flex gap-[8px] text-sm sm:text-base'>
-              {hashtags.map((hashtag, idx) => {
-                return (
-                  <div
-                    key={idx}
-                    className='h-[32px] px-[20px] bg-[#EEEEEE] flex items-center justify-center rounded-full'
-                  >
-                    #{hashtag}
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
-          {user && (
-            <form className='w-100 flex gap-[20px] '>
-              <input
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                required
-                className='min-w-0 h-[55px] flex-1 shrink bg-white rounded border border-[#E1E1E1] focus:border-black focus:!border-black px-5 py-3.5 flex gap-4'
-              ></input>
-              <Button
-                width='shrink-0 w-[88px] sm:w-[142px]'
-                onClick={handleCommentSubmit}
-              >
-                댓글 작성
-              </Button>
-            </form>
-          )}
-
-          {comments.map((comment) => (
-            <Comment
-              key={comment.comment_id}
-              comment={comment}
-              user={user}
-              setComments={setComments}
-              formatTimestamp={formatTimestamp}
-            ></Comment>
-          ))}
-        </div>
+        ) : (
+          <div className='w-full h-[400px] flex items-center justify-center'>
+            <img src={LoadingSpinner} alt='로딩중' width='50px' />
+          </div>
+        )}
       </div>
 
       <Modal

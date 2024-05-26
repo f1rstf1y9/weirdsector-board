@@ -17,6 +17,7 @@ import Modal from '@components/Modal';
 import DateRangePicker from '@components/DateRangePicker';
 import CalendarIcon from '@assets/icon-calendar.svg';
 import ChevronDownIcon from '@assets/icon-chevron_down.svg';
+import Calendar from '@assets/calendar.png';
 
 export default function DashboardPage() {
   const navigate = useNavigate();
@@ -166,9 +167,9 @@ export default function DashboardPage() {
               </div>
             )}
           </div>
-          <div className='lg:flex-1 grid gap-[20px] lg:grid-cols-2 items-stretch h-full'>
-            {postCountsByDate && postCountsByDateAndBoard && hashtagCounts && (
-              <>
+          {postCountsByDate && postCountsByDateAndBoard && hashtagCounts ? (
+            <>
+              <div className='lg:flex-1 grid gap-[20px] lg:grid-cols-2 items-stretch h-full'>
                 <div className='rounded border border-[#E1E1E1] min-h-[438px] lg:min-h-0 px-[28px] py-[20px] flex flex-col gap-[20px]'>
                   <p className='font-bold'>날짜별 게시글 등록 수</p>
                   <div className='w-full flex justify-end items-center gap-[12px]'>
@@ -209,9 +210,18 @@ export default function DashboardPage() {
                     <StackedBarChart data={postCountsByDateAndBoard} />
                   </div>
                 </div>
-              </>
-            )}
-          </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className='flex-2 w-full h-[400px] flex flex-col items-center justify-center'>
+                <img src={Calendar} alt='달력 이미지' width='200px' />
+                <p className='font-bold text-[#aaa]'>
+                  조회할 날짜를 선택해 주세요.
+                </p>
+              </div>
+            </>
+          )}
         </div>
       </div>
       {isModalOpen && (

@@ -17,7 +17,7 @@ export default function SignUpPage() {
   const [password, setPassword] = useState('');
   const [passwordCheck, setPasswordCheck] = useState('');
   const [nickname, setNickname] = useState('');
-  const [isChecked, setIsChecked] = useState('');
+  const [isChecked, setIsChecked] = useState(false);
 
   const [emailErr, setEmailErr] = useState('');
   const [pwdErr, setPwdErr] = useState('');
@@ -37,54 +37,42 @@ export default function SignUpPage() {
     }
   }, [isChecked]);
 
+  const validatePassword = (password) => {
+    const regex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+    return regex.test(password);
+  };
+
+  const validateForm = () => {
+    let isValid = true;
+
+    if (!validatePassword(password)) {
+      setPwdErr(
+        '영어, 숫자, 특수기호 중 2가지 이상 포함해 8자 이상이어야 합니다.'
+      );
+      isValid = false;
+    } else {
+      setPwdErr('');
+    }
+
+    if (password != passwordCheck) {
+      setPwdCheckErr('비밀번호가 일치하지 않습니다.');
+      isValid = false;
+    } else {
+      setPwdCheckErr('');
+    }
+
+    if (!isChecked) {
+      setCheckErr('개인정보 처리방침 / 데이터 활용 동의에 체크해주세요.');
+      isValid = false;
+    } else {
+      setCheckErr('');
+    }
+
+    return isValid;
+  };
+
   const signUpHandler = async (e) => {
     e.preventDefault();
-
-    const validatePassword = () => {
-      if (password.length < 8) {
-        return false;
-      }
-      const regexes = [/[A-Za-z]/g, /[0-9]/g, /[^A-Za-z0-9]/g];
-      let matchCount = 0;
-      for (let regex of regexes) {
-        if (password.match(regex)) {
-          matchCount++;
-        }
-      }
-      if (matchCount < 2) {
-        return false;
-      }
-      return true;
-    };
-
-    const validateForm = () => {
-      let isValid = true;
-
-      if (!validatePassword(password)) {
-        setPwdErr(
-          '영어, 숫자, 특수기호 중 2가지 이상 포함해 8자 이상이어야 합니다.'
-        );
-        isValid = false;
-      } else {
-        setPwdErr('');
-      }
-
-      if (password != passwordCheck) {
-        setPwdCheckErr('비밀번호가 일치하지 않습니다.');
-        isValid = false;
-      } else {
-        setPwdCheckErr('');
-      }
-
-      if (!isChecked) {
-        setCheckErr('개인정보 처리방침 / 데이터 활용 동의에 체크해주세요.');
-        isValid = false;
-      } else {
-        setCheckErr('');
-      }
-
-      return isValid;
-    };
 
     if (!validateForm()) {
       return;
