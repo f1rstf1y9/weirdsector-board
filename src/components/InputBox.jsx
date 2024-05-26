@@ -20,7 +20,7 @@ export default function InputBox({
   }, [err]);
 
   const toggleType = () => {
-    setCurrentType(currentType == 'password' ? 'text' : 'password');
+    setCurrentType(currentType === 'password' ? 'text' : 'password');
   };
 
   return (
@@ -40,9 +40,9 @@ export default function InputBox({
           className={`h-[27px] text-sm sm:text-base placeholder-[#808080] ${type === 'password' ? 'w-[calc(100%-30px)]' : 'w-full'}`}
           autoComplete={autocomplete}
         />
-        {type == 'password' && (
+        {type === 'password' && (
           <img
-            src={currentType == 'password' ? EyeIcon : EyeOffIcon}
+            src={currentType === 'password' ? EyeIcon : EyeOffIcon}
             alt='비밀번호 보이기/숨기기'
             className='cursor-pointer w-6'
             onClick={toggleType}
