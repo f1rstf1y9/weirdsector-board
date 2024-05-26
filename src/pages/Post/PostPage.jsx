@@ -228,13 +228,13 @@ function PostPage() {
           {postObj?.attachment_name && (
             <div className='flex gap-[20px]'>
               <p className='text-red'>첨부된 파일</p>
-              <a
+              <Link
                 href={attachmentUrl}
                 className='font-bold'
                 download={postObj?.attachment_name}
               >
                 {postObj?.attachment_name}
-              </a>
+              </Link>
             </div>
           )}
 
